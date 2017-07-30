@@ -28,7 +28,7 @@
   	 *
   	 * @since    1.0.0
   	 */
-  	public function asw_load_plugin_textdomain() {
+  	public static function asw_load_plugin_textdomain() {
   		load_plugin_textdomain(
   			'sgmedia-asw',
   			false,

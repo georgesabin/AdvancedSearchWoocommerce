@@ -1,15 +1,11 @@
 <?php
-	
+
 	class ASWAdmin {
 
 		private $all_settings;
 
 		// Initializez meniul si inregistrez setarile din pagina de plugin
 		public static function init() {
-
-			register_activation_hook(__FILE__, array('ASWAdmin', 'plugin_activation'));
-
-			add_action('admin_notices', array('ASWAdmin', 'asw_activation_notice')) ;
 
 			add_action('admin_menu', array('ASWAdmin', 'asw_menu'));
 
@@ -33,7 +29,7 @@
 
 		    add_settings_field('asw_field_category', __( 'Category', 'sgmedia-asw' ), array('ASWAdmin','asw_field_category'), 'asw', 'asw_section', ['label_for' => 'asw_field_category', 'class' => 'asw_category', 'asw_custom_data' => 'custom-category']);
 
-		} 
+		}
 
 		// Functie callback setare
 		public static function asw_section_function($args) {
@@ -128,7 +124,7 @@
 
 		}
 
-		// Adaug in pagina de plugin setarile si butonul de submit 
+		// Adaug in pagina de plugin setarile si butonul de submit
 		public static function asw_admin() {
 
 			// check user capabilities
@@ -137,7 +133,7 @@
 		    }
 
 		    // add error/update messages
- 
+
 			// check if the user have submitted the settings
 			// wordpress will add the "settings-updated" $_GET parameter to the url
 			if (isset($_GET['settings-updated'])) {
@@ -177,7 +173,7 @@
 
 		public static function asw_admin_scripts() {
 
-			
+
 
 		}
 

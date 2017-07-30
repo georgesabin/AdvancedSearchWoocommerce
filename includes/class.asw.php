@@ -30,6 +30,35 @@
 
   class ASW {
 
+    protected $plugin_name;
+    protected $version;
 
+    public function __construct() {
+
+      $plugin_name = 'Advanced Search Woocommerce';
+      $version = '0.1';
+
+    }
+
+    public function set_internationalization() {
+
+      add_action('plugins_loaded', array('ASW_i18n', 'asw_load_plugin_textdomain'));
+
+    }
+
+    public function init_admin() {
+
+      if (is_admin()) {
+        // require_once(ASW_PLUGIN_DIR . 'includes/class.asw_admin.php');
+        ASWAdmin::init();
+      }
+
+    }
+
+    public function init_public() {
+
+
+
+    }
 
   }
