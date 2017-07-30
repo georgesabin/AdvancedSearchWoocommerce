@@ -30,24 +30,25 @@
 		exit;
 	}
 
-	// Define the ASW path
-	define('ASW_PLUGIN_DIR', plugin_dir_path( __FILE__ ));
+	include_once(ABSPATH . 'wp-admin/includes/plugin.php');
 
-	if (is_admin()) {
-		require_once(ASW_PLUGIN_DIR . 'includes/class.asw_admin.php');
-		ASWAdmin::init();
+	// Check if Woocommerce is activated on WP site
+	if (is_plugin_active('woocommerce/woocommerce.php')) {
 
-		//register_deactivation_hook( __FILE__, array( 'ASW', 'plugin_deactivation' ) );
-	}
+		// Define the ASW path
+		define('ASW_PLUGIN_DIR', plugin_dir_path( __FILE__ ));
 
-	include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+		if (is_admin()) {
+			require_once(ASW_PLUGIN_DIR . 'includes/class.asw_admin.php');
+			ASWAdmin::init();
 
-	// check for plugin using plugin name
-	if ( is_plugin_active( 'woocommerce/woocommerce.php' ) && !is_admin()) {
-	    require_once(ASW_PLUGIN_DIR . 'includes/class.asw_public.php');
+			//register_deactivation_hook( __FILE__, array( 'ASW', 'plugin_deactivation' ) );
+		}
+
+		require_once(ASW_PLUGIN_DIR . 'includes/class.asw_public.php');
 		ASWPublic::init();
 		//ASWPublic::asw_change_rules();
 		//if (isset($_GET) && !empty($_GET)) {
 			ASWPublic::asw_change_rules();
 		//}
-	}
+		}
