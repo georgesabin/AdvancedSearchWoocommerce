@@ -1,7 +1,7 @@
 <?php
 
 	include_once(ASW_PLUGIN_DIR . 'includes/class.asw_admin.php');
-	
+
 	class ASWPublic {
 
 		private static $SKU;
@@ -20,6 +20,13 @@
 
 			add_action('enable_category', array('ASWPublic','asw_enable_category'));
 
+			// Load JS files
+			add_action('wp_enqueue_scripts', array('ASWPublic', 'asw_load_js'), 10);
+
+			// Used in ajax
+			add_action('wp_ajax_ASWQ', array('ASWPublic', 'asw_advancedSearchWoocommerceQuery'));
+			add_action('wp_ajax_nopriv_ASWQ', array('ASWPublic', 'asw_advancedSearchWoocommerceQuery'));
+
 		}
 
 		public static function asw_change_rules() {
@@ -28,15 +35,16 @@
 
 			add_filter('pre_get_posts', array('ASWPublic', 'asw_advancedSearchWoocommerceQuery'));
 
-			add_action('init', array('ASWPublic', 'asw_rewriteRule'), 10, 0);
+			// add_action('init', array('ASWPublic', 'asw_rewriteRule'), 10, 0);
 
-			add_action('template_redirect', array('ASWPublic', 'asw_redirectAfterSearch'));		
+			// add_action('template_redirect', array('ASWPublic', 'asw_redirectAfterSearch'));
 
 		}
 
 		public static function asw_enable_sku() {
 
-			global $query; var_dump($query);
+			global $query;
+			// var_dump($query);
 
 			if (is_array(self::$SKU) && array_key_exists('asw_sku', self::$SKU)) {
 
@@ -112,21 +120,26 @@
 			* @return object
 		*/
 
-			public static function asw_advancedSearchWoocommerceQuery($query) {
-				var_dump('2');
+			public static function asw_advancedSearchWoocommerceQuery() {
+				global $wp_query;
+				// var_dump($wp_query); exit;
+				// var_dump('2');
 				$myQuery = [];
-				if (!is_search() && !is_archive())
-					return;
-				$category = urldecode(get_query_var('product_cat')) ? urldecode(get_query_var('product_cat')) : '';
-				if ($category) {
+				// if (!is_search() && !is_archive())
+				// 	return;
+				// $category = urldecode(get_query_var('product_cat')) ? urldecode(get_query_var('product_cat')) : '';
+				if ($_POST['product_cat'] !== '') {
 					$myQuery[] = array(
 						'taxonomy' => 'product_cat',
 						'field' => 'slug',
-						'terms' => $category //if would have been more -> array('term1', 'term2' etc)
+						'terms' => $_POST['product_cat'] //if would have been more -> array('term1', 'term2' etc)
 					);
 				}
-				$query->set('tax_query', $myQuery);
-				return $query;
+				// var_dump(get_query_var('product_cat'));
+				$wp_query->set('tax_query', $myQuery);
+				var_dump($wp_query->query_vars);
+				// die();
+				return $wp_query;
 			}
 
 		/**
@@ -141,7 +154,7 @@ var_dump('3');
 				add_rewrite_rule($regex2,'index.php?post_type=product&product_cat=$matches[1]&s=$matches[2]','top');
 
 			}
-			
+
 
 		/**
 			* I created a redirect
@@ -149,7 +162,7 @@ var_dump('3');
 
 			public static function asw_redirectAfterSearch() {
 				var_dump('4');
-				/*global $wp_rewrite;  
+				/*global $wp_rewrite;
 				print_r($wp_rewrite);*/
 				//global $wp_query; var_dump($wp_query);
 				//if (is_search() || is_archive() || is_shop()) {
@@ -168,6 +181,15 @@ var_dump('3');
 				    	exit();
 					}
 				//}
+			}
+
+			public static function asw_load_js() {
+
+				wp_register_script('asw-public', ASW_PLUGIN_URL . 'public/js/asw_public.js', array(), false, true);
+				wp_localize_script('asw-public', 'myAjax', array('ajaxurl' => admin_url('admin-ajax.php')));
+
+				wp_enqueue_script('asw-public');
+
 			}
 
 	}

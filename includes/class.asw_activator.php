@@ -25,6 +25,7 @@
 		            <p>Thank you for using this plugin! <strong>You are awesome</strong>.</p>
 		        </div>
 		        <?php
+            delete_option('active_plugin');
 		    }
 
 		}

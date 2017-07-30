@@ -37,6 +37,7 @@
 
 		// Define the ASW path
 		define('ASW_PLUGIN_DIR', plugin_dir_path( __FILE__ ));
+		define('ASW_PLUGIN_URL', plugin_dir_url( __FILE__ ));
 
 		require_once(ASW_PLUGIN_DIR . 'includes/class.asw_activator.php');
 		require_once(ASW_PLUGIN_DIR . 'includes/class.asw_deactivator.php');
@@ -51,7 +52,7 @@
 
 		$deactivator = new ASWDeactivator();
 	  register_deactivation_hook(__FILE__, array($deactivator, 'plugin_deactivation'));
-		
+
 		$i18n = new ASW_i18n();
 
 		$asw = new ASW();

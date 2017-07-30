@@ -57,7 +57,7 @@
 
     public function init_public() {
 
-
+      ASWPublic::init();
 
     }
 
