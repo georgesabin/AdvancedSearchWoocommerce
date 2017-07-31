@@ -37,6 +37,7 @@
 
       $plugin_name = 'Advanced Search Woocommerce';
       $version = '0.1';
+      add_filter('wc_get_template', array('ASW', 'ovverride_woocommerce_templates'), 10, 2);
 
     }
 
@@ -60,5 +61,16 @@
       ASWPublic::init();
 
     }
+
+    public static function ovverride_woocommerce_templates($located, $template_name) {
+
+      if( $template_name == 'archive-product.php' ) {
+        $located = plugin_dir_path( __FILE__ ) . 'woocommerce/archive-product.php';
+      }
+
+      return $located;
+
+    }
+
 
   }

@@ -59,5 +59,5 @@
 		$asw->set_internationalization();
 		$asw->init_admin();
 		$asw->init_public();
-		
+
 	}

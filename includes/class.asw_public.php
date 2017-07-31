@@ -93,7 +93,9 @@
 		}
 
 			public static function asw_advancedSearchWoocommerceQuery() {
+
 				global $wp_query;
+
 				$asw_query = array(
 					'post_type' => $_GET['post_type'],
 					'tax_query' => array(
@@ -104,6 +106,7 @@
 						)
 					)
 				);
+
 				query_posts($asw_query);
 
 				do_action('woocommerce_archive_description'); ?>
@@ -135,6 +138,8 @@
 					 <?php woocommerce_get_template('loop/no-products-found.php'); ?>
 
 			 <?php endif;
+
+			wp_reset_query();
 
 			wp_die();
 
