@@ -59,12 +59,5 @@
 		$asw->set_internationalization();
 		$asw->init_admin();
 		$asw->init_public();
-
-		// require_once(ASW_PLUGIN_DIR . 'includes/class.asw_public.php');
-		// ASWPublic::init();
-		// //ASWPublic::asw_change_rules();
-		// //if (isset($_GET) && !empty($_GET)) {
-		// 	ASWPublic::asw_change_rules();
-		// //}
-		// }
+		
 	}
