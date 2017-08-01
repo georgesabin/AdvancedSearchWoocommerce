@@ -8,9 +8,11 @@
 
 		private static $category;
 
-		public $hmltProd = '';
+		private static $ASWData;
 
 		public static function init() {
+
+			self::$ASWData = (object)$_POST;
 
 			self::$SKU = get_option('asw_sku');
 
@@ -31,14 +33,13 @@
 
 			// Added plugin wrap for build filter
 			add_action('woocommerce_before_shop_loop', array('ASWPublic', 'asw_before_class'), 10);
-			add_action('woocommerce_after_main_content', array('ASWPublic', 'asw_after_class'), 10);
+			// add_action('woocommerce_after_main_content', array('ASWPublic', 'asw_after_class'), 10);
 
 		}
 
 		public static function asw_enable_sku() {
 
 			global $query;
-			// var_dump($query);
 
 			if (is_array(self::$SKU) && array_key_exists('asw_sku', self::$SKU)) {
 
@@ -96,59 +97,105 @@
 
 		}
 
-			public static function asw_advancedSearchWoocommerceQuery() {
+		public static function asw_advancedSearchWoocommerceQuery() {
 
-				global $wp_query;
-				$tax_query = array();
+			global $wp_query;
 
-				if ($_GET['product_cat'] !== '') {
+			// Build the tax query
+			$tax_query = [];
 
-					$tax_query = array(
-						array(
-							'taxonomy' => 'product_cat',
-							'field' => 'slug',
-							'terms' => $_GET['product_cat'] //if would have been more -> array('term1', 'term2' etc)
-						)
-					);
+			// Build the orderby
+			$order_by = [];
 
+			// Check if product_cat is not empty string
+			if (isset(self::$ASWData->product_cat) && self::$ASWData->product_cat !== '') {
+
+				// Set the tax_query
+				$tax_query = [
+					[
+						'taxonomy' => 'product_cat',
+						'field' => 'slug',
+						'terms' => self::$ASWData->product_cat //if would have been more -> array('term1', 'term2' etc)
+					]
+				];
+
+			}
+
+			if (isset(self::$ASWData->orderby) && self::$ASWData->orderby !== '') {
+
+				switch (self::$ASWData->orderby) {
+					case 'menu_order':
+						$meta_key = '';
+						$order = 'asc';
+						$orderby = 'menu_order title';
+						break;
+					case 'popularity':
+						$meta_key = '';
+						$order = 'desc';
+						$orderby = 'total_sales';
+						break;
+					case 'price':
+		        $meta_key = '_price';
+		        $order = 'asc';
+		        $orderby = 'meta_value_num';
+		        break;
+		    case 'price-desc':
+		        $meta_key = '_price';
+		        $order = 'desc';
+		        $orderby = 'meta_value_num';
+		        break;
+			    case 'date':
+		        $meta_key = '';
+		        $order = 'desc';
+		        $orderby = 'date';
+		        break;
+			    case 'rating':
+		        $meta_key = '';
+		        $order = 'desc';
+		        $orderby = 'rating';
+		        break;
+					default:
+						break;
 				}
 
-				$asw_query = array(
-					'post_type' => $_GET['post_type'],
-					'posts_per_page' => 1,
-					'paged' => ($_GET['paged'] !== '' ? (int)$_GET['paged'] : ''),
-					'tax_query' => $tax_query
-				);
+			}
 
-				query_posts($asw_query);
+			// Build a new query posts
+			$asw_query = array(
+				'post_type' => $_POST['post_type'],
+				'posts_per_page' => get_option( 'posts_per_page' ),
+				'paged' => ($_POST['paged'] !== '' ? (int)$_POST['paged'] : ''),
+				'tax_query' => $tax_query,
+				'orderby' => $orderby,
+				'order' => $order,
+				'meta_key' => $meta_key
+			);
 
-				if (have_posts()) : ?>
+			// Set the query posts
+			query_posts($asw_query);
 
-				<?php woocommerce_result_count(); ?>
+			if (have_posts()) {
 
-				   <?php
-				   // I don't want the sorting anymore
-				   //do_action('woocommerce_before_shop_loop');
-				   ?>
+				// I don't want the sorting anymore
+				do_action('woocommerce_before_shop_loop');
 
-				   <ul class = "products-list">
-				       <?php while (have_posts()) : the_post(); ?>
+				echo '<ul class="products">';
+					while (have_posts()) {
 
-				           <?php wc_get_template_part('content', 'product'); ?>
+						the_post();
+						wc_get_template_part('content', 'product');
 
-				       <?php endwhile; // end of the loop.   ?>
-				   </ul>
+					}
+				echo '</ul>';
 
-				   <?php
-				   /*  woocommerce pagination  */
-				   do_action('woocommerce_after_shop_loop');
-				   ?>
+				/*  woocommerce pagination  */
+				do_action('woocommerce_after_shop_loop');
 
-				<?php elseif (!woocommerce_product_subcategories(array('before' => woocommerce_product_loop_start(false), 'after' => woocommerce_product_loop_end(false)))) : ?>
+			} else if (!woocommerce_product_subcategories(array('before' => woocommerce_product_loop_start(false), 'after' => woocommerce_product_loop_end(false)))) {
 
-				   <?php wc_get_template('loop/no-products-found.php'); ?>
+				wc_get_template('loop/no-products-found.php');
 
-				<?php endif;
+			}
 
 			wp_reset_query();
 
