@@ -29,6 +29,10 @@
 			add_action('wp_ajax_ASWQ', array('ASWPublic', 'asw_advancedSearchWoocommerceQuery'));
 			add_action('wp_ajax_nopriv_ASWQ', array('ASWPublic', 'asw_advancedSearchWoocommerceQuery'));
 
+			// Added plugin wrap for build filter
+			add_action('woocommerce_before_shop_loop', array('ASWPublic', 'asw_before_class'), 10);
+			add_action('woocommerce_after_main_content', array('ASWPublic', 'asw_after_class'), 10);
+
 		}
 
 		public static function asw_enable_sku() {
@@ -95,49 +99,56 @@
 			public static function asw_advancedSearchWoocommerceQuery() {
 
 				global $wp_query;
+				$tax_query = array();
 
-				$asw_query = array(
-					'post_type' => $_GET['post_type'],
-					'tax_query' => array(
+				if ($_GET['product_cat'] !== '') {
+
+					$tax_query = array(
 						array(
 							'taxonomy' => 'product_cat',
 							'field' => 'slug',
 							'terms' => $_GET['product_cat'] //if would have been more -> array('term1', 'term2' etc)
 						)
-					)
+					);
+
+				}
+
+				$asw_query = array(
+					'post_type' => $_GET['post_type'],
+					'posts_per_page' => 1,
+					'paged' => ($_GET['paged'] !== '' ? (int)$_GET['paged'] : ''),
+					'tax_query' => $tax_query
 				);
 
 				query_posts($asw_query);
 
-				do_action('woocommerce_archive_description'); ?>
-
-			 <?php if (have_posts()) : ?>
+				if (have_posts()) : ?>
 
 				<?php woocommerce_result_count(); ?>
 
-					 <?php
-					 // I don't want the sorting anymore
-					 //do_action('woocommerce_before_shop_loop');
-					 ?>
+				   <?php
+				   // I don't want the sorting anymore
+				   //do_action('woocommerce_before_shop_loop');
+				   ?>
 
-					 <ul class = "products-list">
-							 <?php while (have_posts()) : the_post(); ?>
+				   <ul class = "products-list">
+				       <?php while (have_posts()) : the_post(); ?>
 
-									 <?php wc_get_template_part('content', 'product'); ?>
+				           <?php wc_get_template_part('content', 'product'); ?>
 
-							 <?php endwhile; // end of the loop.   ?>
-					 </ul>
+				       <?php endwhile; // end of the loop.   ?>
+				   </ul>
 
-					 <?php
-					 /*  woocommerce pagination  */
-					 do_action('woocommerce_after_shop_loop');
-					 ?>
+				   <?php
+				   /*  woocommerce pagination  */
+				   do_action('woocommerce_after_shop_loop');
+				   ?>
 
-			 <?php elseif (!woocommerce_product_subcategories(array('before' => woocommerce_product_loop_start(false), 'after' => woocommerce_product_loop_end(false)))) : ?>
+				<?php elseif (!woocommerce_product_subcategories(array('before' => woocommerce_product_loop_start(false), 'after' => woocommerce_product_loop_end(false)))) : ?>
 
-					 <?php woocommerce_get_template('loop/no-products-found.php'); ?>
+				   <?php wc_get_template('loop/no-products-found.php'); ?>
 
-			 <?php endif;
+				<?php endif;
 
 			wp_reset_query();
 
@@ -155,5 +166,18 @@
 				wp_enqueue_script('asw-public');
 
 			}
+
+			public static function asw_before_class() {
+
+				echo '<div class="asw_wrap">';
+
+			}
+
+			public static function asw_after_class() {
+
+				echo '</div>';
+
+			}
+
 
 	}

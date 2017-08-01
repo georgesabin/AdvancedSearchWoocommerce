@@ -37,7 +37,7 @@
 
       $plugin_name = 'Advanced Search Woocommerce';
       $version = '0.1';
-      add_filter('wc_get_template', array('ASW', 'ovverride_woocommerce_templates'), 10, 2);
+      // add_filter('wc_get_template', array('ASW', 'ovverride_woocommerce_templates'), 10, 2);
 
     }
 
