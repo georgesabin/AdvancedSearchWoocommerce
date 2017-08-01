@@ -37,7 +37,10 @@
 
       $plugin_name = 'Advanced Search Woocommerce';
       $version = '0.1';
-      // add_filter('wc_get_template', array('ASW', 'ovverride_woocommerce_templates'), 10, 2);
+
+      // Load core scripts
+      // add_action('wp_enqueue_scripts', ['ASW', 'core_scripts']);
+      // add_action('admin_enqueue_scripts', ['ASW', 'core_scripts']);
 
     }
 
@@ -62,15 +65,13 @@
 
     }
 
-    public static function ovverride_woocommerce_templates($located, $template_name) {
+    public static function core_scripts() {
 
-      if( $template_name == 'archive-product.php' ) {
-        $located = plugin_dir_path( __FILE__ ) . 'woocommerce/archive-product.php';
-      }
-
-      return $located;
+      wp_enqueue_script('bootstrap', ASW_PLUGIN_URL . 'general/js/bootstrap.min.js');
+      wp_enqueue_style('bootstrap', ASW_PLUGIN_URL . 'general/css/bootstrap.min.css', false, '', false);
+      // wp_enqueue_style('bootstrap-grid', ASW_PLUGIN_URL . 'general/css/bootstrap-grid.min.css');
+      // wp_enqueue_style('bootstrap-reboot', ASW_PLUGIN_URL . 'general/css/bootstrap-reboot.min.css');
 
     }
-
 
   }

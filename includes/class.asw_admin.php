@@ -27,7 +27,7 @@
 
 		    add_settings_field('asw_field_sku', __('SKU','sgmedia-asw'), array('ASWAdmin','asw_field_sku'), 'asw', 'asw_section', array('label_for' => 'asw_sku', 'class' => 'asw_sku', 'asw_custom_data' => 'custom-sku'));
 
-		    add_settings_field('asw_field_category', __( 'Category', 'sgmedia-asw' ), array('ASWAdmin','asw_field_category'), 'asw', 'asw_section', ['label_for' => 'asw_field_category', 'class' => 'asw_category', 'asw_custom_data' => 'custom-category']);
+		    add_settings_field('asw_category_field', __( 'Category', 'sgmedia-asw' ), array('ASWAdmin','asw_field_category'), 'asw', 'asw_section');
 
 		}
 
@@ -58,7 +58,7 @@
 
 			?>
 
-			<input type="checkbox" name="asw_category[<?php echo esc_attr($args['label_for']); ?>]" value="enable" <?php !empty($category[$args['label_for']]) ? checked(esc_attr($category[$args['label_for']]), 'enable', true) : ''; ?>> <?php echo __('Enable Category search', 'sgmedia-asw'); ?>
+			<input type="checkbox" name="asw_category" value="enable" <?php !empty($category) ? checked(esc_attr($category), 'enable', true) : ''; ?>> <?php echo __('Enable Category search', 'sgmedia-asw'); ?>
 
 			<?php
 
@@ -168,7 +168,7 @@
 			/**
 			* add_menu_page( string $page_title, string $menu_title, string $capability, string $menu_slug, callable $function = '', string $icon_url = '', int $position = null )
 			**/
-	        add_submenu_page('woocommerce', __('SG Media Advanced Search Woocommerce','sgmedia-asw'), __('ASW by SG Media Freelancer','sgmedia-asw'), 'manage_options', 'asw', array('ASWAdmin', 'asw_admin'));
+	        add_submenu_page('woocommerce', __('SG Media Advanced Search Woocommerce','sgmedia-asw'), __('ASW by SG Media','sgmedia-asw'), 'manage_options', 'asw', array('ASWAdmin', 'asw_admin'));
 		}
 
 		public static function asw_admin_scripts() {

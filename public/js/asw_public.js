@@ -10,6 +10,9 @@ $(document).ready(function() {
         event.preventDefault();
     });
 
+  // Build select2
+  $('*[name="product_cat"]').select2();
+
   // Make a AJAX request if the select of category is changed
   $('body').on('change', '*[name="product_cat"], *[name="orderby"]', function(e) {
 
@@ -28,7 +31,8 @@ $(document).ready(function() {
           post_type: 'product',
           action: 'ASWQ',
           product_cat: $('*[name="product_cat"]').val(),
-          orderby: orderby
+          orderby: orderby,
+          nonce: $('*[name="asw_nonce"]').val()
         },
         success: function(data) {
 
@@ -68,7 +72,8 @@ function paginationAJAX() {
         action: 'ASWQ',
         product_cat: $('*[name="product_cat"]').val(),
         paged: $(this).html(),
-        orderby: orderby
+        orderby: orderby,
+        nonce: $('*[name="asw_nonce"]').val()
       },
       success: function(data) {
         $('.asw_wrap').empty();
