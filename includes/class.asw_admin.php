@@ -13,8 +13,6 @@
 
 			add_action('admin_enqueue_scripts', array('ASWAdmin', 'asw_admin_scripts'));
 
-			add_action('admin_enqueue_scripts', array('ASWAdmin', 'asw_admin_styles'));
-
 		}
 
 		// Creez grupul de setari si adaug in grup setari noi
@@ -53,6 +51,26 @@
 		}
 
 		public static function asw_field_category($args) {
+
+			?>
+
+			<div class="bootstrap-wrapper">
+     <div class="container">
+          <div class="row">
+               <div class="col-md-4">
+                    <h3>This is a column!</h3>
+               </div>
+               <div class="col-md-4">
+                    <h3>This is a column!</h3>
+               </div>
+               <div class="col-md-4">
+                    <h3>This is a column!</h3>
+               </div>
+          </div>
+     </div>
+</div>
+
+<?php
 
 			$category = get_option('asw_category');
 
@@ -171,15 +189,12 @@
 	        add_submenu_page('woocommerce', __('SG Media Advanced Search Woocommerce','sgmedia-asw'), __('ASW by SG Media','sgmedia-asw'), 'manage_options', 'asw', array('ASWAdmin', 'asw_admin'));
 		}
 
+		/**
+		* With bootstrap-include.js file will be include js and css files
+		**/
 		public static function asw_admin_scripts() {
 
-
-
-		}
-
-		public static function asw_admin_styles() {
-
-
+			wp_enqueue_script('bootstrap-include-css', ASW_PLUGIN_URL . 'admin/js/bootstrap-include.js');
 
 		}
 
