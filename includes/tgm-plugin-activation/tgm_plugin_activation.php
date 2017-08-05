@@ -79,7 +79,9 @@ function sgmedia_asw_register_required_plugins() {
 			'source'       => 'https://downloads.wordpress.org/plugin/woocommerce.3.1.1.zip', // The plugin source.
 			'required'     => true, // If false, the plugin is only 'recommended' instead of required.
 			'force_activation' => false
-		),
+		)
+
+	);
 
 	/*
 	 * Array of configuration settings. Amend each line as needed.
