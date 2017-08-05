@@ -185,7 +185,7 @@
 				'orderby' => $orderby,
 				'order' => $order,
 				'meta_key' => $meta_key,
-				'meta_query' => $meta_query
+				// 'meta_query' => $meta_query
 			);
 
 			// Set the query posts
