@@ -24,10 +24,10 @@ if (!document.getElementById(bootstrapCss))
     //load other stylesheets that override bootstrap styles here, using the same technique from above
 
     var aswStyle = document.createElement('link');
-    customStyles.id = 'asw-style';
-    customStyles.rel = 'stylesheet';
-    customStyles.type = 'text/css';
-    customStyles.href = '../wp-content/plugins/AdvancedSearchWoocommerce/admin/css/style.css';
-    customStyles.media = 'all';
+    aswStyle.id = 'asw-style';
+    aswStyle.rel = 'stylesheet';
+    aswStyle.type = 'text/css';
+    aswStyle.href = '../wp-content/plugins/AdvancedSearchWoocommerce/admin/css/style.css';
+    aswStyle.media = 'all';
     head.appendChild(aswStyle);
 }

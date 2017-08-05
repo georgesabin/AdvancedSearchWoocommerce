@@ -21,7 +21,7 @@
 		    register_setting('asw', 'asw_category');
 		    register_setting('asw', 'asw_sku');
 
-		    add_settings_section('asw_section', __( 'Section.', 'sgmedia-asw' ), array('ASWAdmin', 'asw_section_function'), 'asw');
+		    add_settings_section('asw_section', '', array('ASWAdmin', 'asw_section_function'), 'asw');
 
 		    add_settings_field('asw_field_sku', __('SKU','sgmedia-asw'), array('ASWAdmin','asw_field_sku'), 'asw', 'asw_section', array('label_for' => 'asw_sku', 'class' => 'asw_sku', 'asw_custom_data' => 'custom-sku'));
 
@@ -32,9 +32,9 @@
 		// Functie callback setare
 		public static function asw_section_function($args) {
 
-			?>
-				<p id="<?php echo esc_attr($args['id']); ?>"><?php esc_html_e('Follow the white rabbit.', 'sgmedia-asw'); ?></p>
-			<?php
+				echo '<h2 id="' . esc_attr($args['id']) . '" style="padding-top: 15px;">';
+					esc_html_e('Follow the white rabbit', 'sgmedia-asw');
+				echo '</h2>';
 
 		}
 
@@ -51,26 +51,6 @@
 		}
 
 		public static function asw_field_category($args) {
-
-			?>
-
-			<div class="bootstrap-wrapper">
-     <div class="container">
-          <div class="row">
-               <div class="col-md-4">
-                    <h3>This is a column!</h3>
-               </div>
-               <div class="col-md-4">
-                    <h3>This is a column!</h3>
-               </div>
-               <div class="col-md-4">
-                    <h3>This is a column!</h3>
-               </div>
-          </div>
-     </div>
-</div>
-
-<?php
 
 			$category = get_option('asw_category');
 
@@ -163,20 +143,56 @@
 			settings_errors( 'asw_messages' );
 
 		    ?>
-		    <div class="wrap">
-		        <h1><?php esc_html(get_admin_page_title()); ?></h1>
-		        <form action="options.php" method="post">
-		            <?php
-		            // output security fields for the registered setting "sgmedia-asw_options"
-		            settings_fields('asw');
-		            // output setting sections and their fields
-		            // (sections are registered for "sgmedia-asw", each field is registered to a specific section)
-		            do_settings_sections('asw');
-		            // output save settings button
-		            submit_button('Save Settings');
-		            ?>
-		        </form>
-		    </div>
+		    <div class="bootstrap-wrapper">
+					<div class="container-fluid">
+						<div class="row">
+
+								<div class="card" style="width:100%; max-width: none;">
+			  					<div class="card-block">
+							        <h4 class="card-title"><?php echo esc_html(get_admin_page_title()); ?></h4>
+											<ul class="nav nav-tabs" role="tablist">
+											  <li class="nav-item">
+											    <a class="nav-link active" data-toggle="tab" href="#general" role="tab"><?php echo __('General', 'sgmedia-asw'); ?></a>
+											  </li>
+											  <li class="nav-item">
+											    <a class="nav-link" data-toggle="tab" href="#profile" role="tab">Profile</a>
+											  </li>
+											  <li class="nav-item">
+											    <a class="nav-link" data-toggle="tab" href="#messages" role="tab">Messages</a>
+											  </li>
+											  <li class="nav-item">
+											    <a class="nav-link" data-toggle="tab" href="#settings" role="tab">Settings</a>
+											  </li>
+											</ul>
+											<form action="options.php" method="post">
+											    <?php
+
+													echo '<div class="tab-content">';
+														echo '<div class="tab-pane active" id="general" role="tabpanel">';
+											        // output security fields for the registered setting "sgmedia-asw_options"
+											        settings_fields('asw');
+											        // output setting sections and their fields
+											        // (sections are registered for "sgmedia-asw", each field is registered to a specific section)
+											        do_settings_sections('asw');
+														echo '</div>';
+														echo '<div class="tab-pane" id="profile" role="tabpanel">qweqe.</div>';
+													echo '</div>';
+
+											    // output save settings button
+											    submit_button('Save Settings');
+											    ?>
+											</form>
+											<div class="row">
+												<div class="col-md-12" style="text-align: right;">
+													<span class="badge badge-default">v 0.1</span>
+												</div>
+											</div>
+										</div>
+					    		</div>
+
+						</div>
+					</div>
+				</div>
 		    <?php
 
 		}
@@ -186,7 +202,7 @@
 			/**
 			* add_menu_page( string $page_title, string $menu_title, string $capability, string $menu_slug, callable $function = '', string $icon_url = '', int $position = null )
 			**/
-	        add_submenu_page('woocommerce', __('SG Media Advanced Search Woocommerce','sgmedia-asw'), __('ASW by SG Media','sgmedia-asw'), 'manage_options', 'asw', array('ASWAdmin', 'asw_admin'));
+	        add_submenu_page('woocommerce', __('Advanced Search Woocommerce by SG Media','sgmedia-asw'), __('ASW by SG Media','sgmedia-asw'), 'manage_options', 'asw', array('ASWAdmin', 'asw_admin'));
 		}
 
 		/**
@@ -194,7 +210,11 @@
 		**/
 		public static function asw_admin_scripts() {
 
+			wp_enqueue_script('tether', ASW_PLUGIN_URL . 'general/js/tether.min.js');
 			wp_enqueue_script('bootstrap-include-css', ASW_PLUGIN_URL . 'admin/js/bootstrap-include.js');
+			wp_enqueue_script('bootstrap', ASW_PLUGIN_URL . 'general/js/bootstrap.min.js');
+			// wp_enqueue_style('admin-style', ASW_PLUGIN_URL . 'admin/css/style.css');
+
 
 		}
 

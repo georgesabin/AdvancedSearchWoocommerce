@@ -1,0 +1,6 @@
+.nav-tabs .nav-item {
+  font-size: 20px;
+}
+.nav-tabs .nav-item a:focus {
+  box-shadow: none;
+}
