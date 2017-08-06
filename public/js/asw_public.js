@@ -1,7 +1,11 @@
 $ = jQuery;
 // Get the all products before filter
 var initProducts = $('.asw_wrap').html();
+var regularPriceMin = 0;
+var regularPriceMax = 0;
+
 $('a.page-numbers').css( 'cursor', 'pointer' );
+
 
 $(document).ready(function() {
 
@@ -13,8 +17,7 @@ $(document).ready(function() {
   // Build select2
   $('*[name="product_cat"]').select2();
 
-  // Make a AJAX request if the select of category is changed
-  $('body').on('change', '*[name="product_cat"], *[name="orderby"]', function(e) {
+  function ASW_AJAX(e) {
 
     e.preventDefault();
 
@@ -28,11 +31,14 @@ $(document).ready(function() {
         dataType: 'html',
         url: myAjax.ajaxurl,
         data: {
+          nonce: $('*[name="asw_nonce"]').val(),
           post_type: 'product',
           action: 'ASWQ',
           product_cat: $('*[name="product_cat"]').val(),
           orderby: orderby,
-          nonce: $('*[name="asw_nonce"]').val()
+          sku: $('*[name="sku"]').val(),
+          reqular_price_min: regularPriceMin,
+          reqular_price_max: regularPriceMax
         },
         success: function(data) {
 
@@ -50,7 +56,16 @@ $(document).ready(function() {
 
     } else { $('.asw_wrap').html(initProducts); }
 
-  });
+  }
+
+  // Make a AJAX request if the select of category is changed or orderby is changed
+  $('body').on('change', '*[name="product_cat"], *[name="orderby"]', ASW_AJAX);
+
+  // Make a AJAX reqest if SKU input is completed
+  $('body').on('input', '*[name="sku"]', ASW_AJAX);
+
+  // Make a AJAX reqest if range price is changed
+  $('body').on('slidechange', '#slider-range', ASW_AJAX);
 
   // By default. Remove href and run request ajax for pagination
   $('a.page-numbers').removeAttr('href');
@@ -73,6 +88,7 @@ function paginationAJAX() {
         product_cat: $('*[name="product_cat"]').val(),
         paged: $(this).html(),
         orderby: orderby,
+        sku: $('*[name="sku"]').val(),
         nonce: $('*[name="asw_nonce"]').val()
       },
       success: function(data) {
@@ -86,3 +102,25 @@ function paginationAJAX() {
   });
 
 }
+
+function rangePrice() {
+
+  $('#slider-range').slider({
+
+    range: true,
+    // values: [ 75, 300 ], // Create in admin 2 fields
+    min: Math.round(myAjax.minPrice),
+    max: Math.round(myAjax.maxPrice),
+    step: 1,
+    slide: function(event, ui) {
+      regularPriceMin = ui.values[0];
+      regularPriceMax = ui.values[1];
+    }
+
+  });
+
+  console.log($( '#slider-range' ).slider( 'option', 'min'), $( '#slider-range' ).slider( 'option', 'max'));
+
+}
+
+rangePrice();

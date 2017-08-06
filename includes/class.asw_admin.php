@@ -4,7 +4,6 @@
 
 		private $all_settings;
 
-		// Initializez meniul si inregistrez setarile din pagina de plugin
 		public static function init() {
 
 			add_action('admin_menu', array('ASWAdmin', 'asw_menu'));
@@ -15,17 +14,17 @@
 
 		}
 
-		// Creez grupul de setari si adaug in grup setari noi
+		// Create the group of settings and add in group new settings
 		public static function asw_register_setting() {
 
-		    register_setting('asw', 'asw_category');
-		    register_setting('asw', 'asw_sku');
+		   	register_setting('asw_general', 'asw_sku');
+		    register_setting('asw_general', 'asw_category');
 
-		    add_settings_section('asw_section', '', array('ASWAdmin', 'asw_section_function'), 'asw');
+		    add_settings_section('asw_section', '', array('ASWAdmin', 'asw_section_function'), 'asw_general');
 
-		    add_settings_field('asw_field_sku', __('SKU','sgmedia-asw'), array('ASWAdmin','asw_field_sku'), 'asw', 'asw_section', array('label_for' => 'asw_sku', 'class' => 'asw_sku', 'asw_custom_data' => 'custom-sku'));
+		    add_settings_field('asw_sku_field', __('SKU','sgmedia-asw'), array('ASWAdmin','asw_field_sku'), 'asw_general', 'asw_section');
 
-		    add_settings_field('asw_category_field', __( 'Category', 'sgmedia-asw' ), array('ASWAdmin','asw_field_category'), 'asw', 'asw_section');
+		    add_settings_field('asw_category_field', __( 'Category', 'sgmedia-asw' ), array('ASWAdmin','asw_field_category'), 'asw_general', 'asw_section');
 
 		}
 
@@ -44,7 +43,7 @@
 
 			?>
 
-			<input type="checkbox" name="asw_sku[<?php echo esc_attr($args['label_for']); ?>]" value="enable" <?php !empty($sku[$args['label_for']]) ? checked(esc_attr($sku[$args['label_for']]), 'enable', true) : ''; ?>> <?php echo __('Enable SKU search', 'sgmedia-asw'); ?>
+			<input type="checkbox" name="asw_sku" value="disable" <?php !empty($sku) ? checked(esc_attr($sku), 'disable', true) : ''; ?>> <?php echo __('Disable SKU search', 'sgmedia-asw'); ?>
 
 			<?php
 
@@ -56,7 +55,7 @@
 
 			?>
 
-			<input type="checkbox" name="asw_category" value="enable" <?php !empty($category) ? checked(esc_attr($category), 'enable', true) : ''; ?>> <?php echo __('Enable Category search', 'sgmedia-asw'); ?>
+			<input type="checkbox" name="asw_category" value="disable" <?php !empty($category) ? checked(esc_attr($category), 'disable', true) : ''; ?>> <?php echo __('Disable Category search', 'sgmedia-asw'); ?>
 
 			<?php
 
@@ -170,10 +169,10 @@
 													echo '<div class="tab-content">';
 														echo '<div class="tab-pane active" id="general" role="tabpanel">';
 											        // output security fields for the registered setting "sgmedia-asw_options"
-											        settings_fields('asw');
+											        settings_fields('asw_general');
 											        // output setting sections and their fields
 											        // (sections are registered for "sgmedia-asw", each field is registered to a specific section)
-											        do_settings_sections('asw');
+											        do_settings_sections('asw_general');
 														echo '</div>';
 														echo '<div class="tab-pane" id="profile" role="tabpanel">qweqe.</div>';
 													echo '</div>';

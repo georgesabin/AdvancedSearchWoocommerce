@@ -10,6 +10,8 @@
 
 		private static $ASWData;
 
+		private static $productsPrice;
+
 		public static function init() {
 
 			self::$ASWData = (object)$_POST;
@@ -18,6 +20,8 @@
 
 			self::$category = get_option('asw_category');
 
+			self::$productsPrice = [];
+
 			// add_action('woocommerce_before_main_content', array('ASWPublic','asw_output'));
 
 			add_action('woocommerce_archive_description', array('ASWPublic','asw_output'));
@@ -25,6 +29,8 @@
 			add_action('enable_sku', array('ASWPublic','asw_enable_sku'));
 
 			add_action('enable_category', array('ASWPublic','asw_enable_category'));
+
+			add_action('enable_slider_range_regular_price', array('ASWPublic','asw_regular_price'));
 
 			// Load JS & CSS files
 			add_action('wp_enqueue_scripts', array('ASWPublic', 'asw_load_css_js'), 10);
@@ -41,15 +47,9 @@
 
 		public static function asw_enable_sku() {
 
-			global $query;
+			if (isset(self::$SKU) && self::$SKU !== 'disable') {
 
-			if (is_array(self::$SKU) && array_key_exists('asw_sku', self::$SKU)) {
-
-				if (self::$SKU['asw_sku'] == 'enable') { ?>
-
-					<input type="search" name="s" />
-
-				<?php }
+					echo '<div class="col-md-3"><input class="form-control" type="search" name="sku" placeholder="' . __('Type the SKU code', 'sgmedia-asw') . '"/></div>';
 
 			}
 
@@ -57,38 +57,37 @@
 
 		public static function asw_enable_category() {
 
-			if (self::$category === 'enable') {
-			?>
+			if (isset(self::$category) && self::$category !== 'disable') {
 
-			<select name="product_cat">
+	      $terms = get_terms('product_cat', 'order=ASC&hide_empty=0');
 
-				<option value="" disable><?php echo __('Select a category', 'sgmedia-asw'); ?></option>
+				echo '<div class="col-md-3"><select class="form-control" name="product_cat">';
 
-				<?php //Display ascendant all categories even those which don't have products
+					echo '<option value="" disable>' .  __('Select a category', 'sgmedia-asw') . '</option>';
 
-		            $terms = get_terms( 'product_cat', 'order=ASC&hide_empty=0' );
+	          foreach($terms as $term) { echo '<option value="' . $term->slug . '">' . $term->name . '</option>'; }
 
-		            foreach($terms as $term) {
+				echo '</select></div>';
 
-		                echo '<option value="' . $term->slug . '">' . $term->name . '</option>';
+			}
 
-		            }
-
-		        ?>
-
-			</select>
-
-			<?php
 		}
+
+		public static function asw_regular_price() {
+
+			echo '<div class="col-md-4"><div id="slider-range"></div></div>';
 
 		}
 
 		public static function asw_output($args) {
 
-			echo '<input type="hidden" name="post_type" value="product" />';
-			echo '<input type="hidden" name="asw_nonce" value="' . wp_create_nonce('generate-nonce') . '" />';
-			do_action('enable_category');
-			do_action('enable_sku');
+			echo '<div class="row">';
+				echo '<input type="hidden" name="post_type" value="product" />';
+				echo '<input type="hidden" name="asw_nonce" value="' . wp_create_nonce('generate-nonce') . '" />';
+				do_action('enable_sku');
+				do_action('enable_category');
+				do_action('enable_slider_range_regular_price');
+			echo '</div>';
 			// echo '<button type="submit">' . __('Submit', 'sgmedia-asw'). '</button>';
 
 		}
@@ -163,16 +162,21 @@
 			}
 
 			$meta_query = [
-				'relation' => 'AND',
+				// 'relation' => 'AND',
+				// [
+				// 	'key' => '_regular_price',
+				// 	'value' => '',
+				// 	'compare' => '<'
+				// ],
+				// [
+				// 	'key' => '_regular_price',
+				// 	'value' => '',
+				// 	'compare' => '>'
+				// ]
 				[
-					'key' => '_regular_price',
-					'value' => '',
-					'compare' => '<'
-				],
-				[
-					'key' => '_regular_price',
-					'value' => '',
-					'compare' => '>'
+					'key' => '_sku',
+					'value' => isset(self::$ASWData->sku) ? sanitize_text_field(self::$ASWData->sku) : null,
+					'compare' => '='
 				]
 			];
 
@@ -222,14 +226,36 @@
 
 			public static function asw_load_css_js() {
 
-				wp_register_script('asw-public', ASW_PLUGIN_URL . 'public/js/asw_public.js', array(), false, true);
-				wp_localize_script('asw-public', 'myAjax', array(
-					'ajaxurl' => admin_url('admin-ajax.php')
-				));
-				wp_enqueue_script('asw-public');
+				wp_enqueue_script('jquery-ui', 'https://code.jquery.com/ui/1.12.1/jquery-ui.js', array(), false, true);
+				wp_enqueue_style('jquery-ui', '//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css');
 
 				wp_enqueue_script('select2', ASW_PLUGIN_URL . 'public/js/select2.min.js', array(), false, true);
 				wp_enqueue_style('select2', ASW_PLUGIN_URL . 'public/css/select2.min.css');
+
+				/**
+				* Create a new query and get the id from each product
+				* Set min and max price and send to JS file for create a range slider
+				**/
+				$products = new WP_Query(array(
+					'post_type' => 'product',
+	        'post_status' => 'publish',
+	        'fields' => 'ids',
+					'posts_per_page' => -1
+				));
+				foreach ($products->posts as $productID) {
+					if (wc_get_product($productID)->get_regular_price() !== '') {
+						self::$productsPrice[] = (float)wc_get_product($productID)->get_regular_price();
+					}
+				}
+				$minPrice = min(self::$productsPrice);
+				$maxPrice = max(self::$productsPrice);
+				wp_register_script('asw-public', ASW_PLUGIN_URL . 'public/js/asw_public.js', array(), false, true);
+				wp_localize_script('asw-public', 'myAjax', array(
+					'ajaxurl' => admin_url('admin-ajax.php'),
+					'minPrice' => $minPrice,
+					'maxPrice' => $maxPrice
+				));
+				wp_enqueue_script('asw-public');
 
 			}
 
