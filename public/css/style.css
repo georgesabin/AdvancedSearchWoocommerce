@@ -1,0 +1,6 @@
+.ui-widget {
+  font-size: 2em;
+}
+.ui-slider-horizontal .ui-slider-handle {
+  top: -0.25em;
+}

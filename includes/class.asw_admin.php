@@ -18,13 +18,19 @@
 		public static function asw_register_setting() {
 
 		   	register_setting('asw_general', 'asw_sku');
-		    register_setting('asw_general', 'asw_category');
+				register_setting('asw_general', 'asw_category');
+				register_setting('asw_general', 'asw_min_regular_price');
+		    register_setting('asw_general', 'asw_max_regular_price');
 
 		    add_settings_section('asw_section', '', array('ASWAdmin', 'asw_section_function'), 'asw_general');
 
 		    add_settings_field('asw_sku_field', __('SKU','sgmedia-asw'), array('ASWAdmin','asw_field_sku'), 'asw_general', 'asw_section');
 
-		    add_settings_field('asw_category_field', __( 'Category', 'sgmedia-asw' ), array('ASWAdmin','asw_field_category'), 'asw_general', 'asw_section');
+				add_settings_field('asw_category_field', __( 'Category', 'sgmedia-asw' ), array('ASWAdmin','asw_field_category'), 'asw_general', 'asw_section');
+
+				add_settings_field('asw_min_regular_price', __( 'Min regular price', 'sgmedia-asw' ), array('ASWAdmin','asw_field_min_regular_price'), 'asw_general', 'asw_section');
+
+		    add_settings_field('asw_max_regular_price', __( 'Max regular price', 'sgmedia-asw' ), array('ASWAdmin','asw_field_max_regular_price'), 'asw_general', 'asw_section');
 
 		}
 
@@ -105,6 +111,34 @@
 			<?php
 
 		}*/
+
+		public static function asw_field_min_regular_price($args) {
+
+			$min_regular_price = get_option('asw_min_regular_price');
+
+			$minPrice = min(ASW::get_all_products_price());
+			$maxPrice = max(ASW::get_all_products_price());
+
+			?>
+			<input type="number" name="asw_min_regular_price" min="<?php echo $minPrice; ?>" max="<?php echo $maxPrice; ?>" value="<?php echo esc_attr($min_regular_price); ?>">
+
+			<?php
+
+		}
+
+		public static function asw_field_max_regular_price($args) {
+
+			$max_regular_price = get_option('asw_max_regular_price');
+
+			$minPrice = min(ASW::get_all_products_price());
+			$maxPrice = max(ASW::get_all_products_price());
+
+			?>
+			<input type="number" name="asw_max_regular_price" min="<?php echo $minPrice; ?>" max="<?php echo $maxPrice; ?>" value="<?php echo esc_attr($max_regular_price); ?>">
+
+			<?php
+
+		}
 
 		public function setAllSettings() {
 //modifica

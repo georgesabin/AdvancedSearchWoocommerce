@@ -74,4 +74,26 @@
 
     }
 
+    public static function get_all_products_price() {
+
+      /**
+      * Create a new query and get the id from each product
+      * Set min and max price and send to JS file for create a range slider
+      **/
+      $products = new WP_Query(array(
+        'post_type' => 'product',
+        'post_status' => 'publish',
+        'fields' => 'ids',
+        'posts_per_page' => -1
+      ));
+      foreach ($products->posts as $productID) {
+        if (wc_get_product($productID)->get_regular_price() !== '') {
+          $productsPrice[] = (float)wc_get_product($productID)->get_regular_price();
+        }
+      }
+
+      return $productsPrice;
+
+    }
+
   }

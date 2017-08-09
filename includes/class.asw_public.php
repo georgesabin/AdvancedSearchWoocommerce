@@ -49,7 +49,10 @@
 
 			if (isset(self::$SKU) && self::$SKU !== 'disable') {
 
-					echo '<div class="col-md-3"><input class="form-control" type="search" name="sku" placeholder="' . __('Type the SKU code', 'sgmedia-asw') . '"/></div>';
+					echo '<div class="col-md-3">
+						<label for="sku">' . __('SKU Code', 'sgmedia-asw') . '</label>
+						<input class="form-control" type="search" name="sku" placeholder="' . __('Type the SKU code', 'sgmedia-asw') . '"/>
+					</div>';
 
 			}
 
@@ -61,13 +64,13 @@
 
 	      $terms = get_terms('product_cat', 'order=ASC&hide_empty=0');
 
-				echo '<div class="col-md-3"><select class="form-control" name="product_cat">';
-
-					echo '<option value="" disable>' .  __('Select a category', 'sgmedia-asw') . '</option>';
-
+				echo '<div class="col-md-4">';
+					echo '<label for="product_cat">' . __('Category', 'sgmedia-asw') . '</label>';
+					echo '<select class="form-control" name="product_cat">';
+						echo '<option value="" disable>' .  __('Select a category', 'sgmedia-asw') . '</option>';
 	          foreach($terms as $term) { echo '<option value="' . $term->slug . '">' . $term->name . '</option>'; }
-
-				echo '</select></div>';
+					echo '</select>';
+				echo '</div>';
 
 			}
 
@@ -75,7 +78,10 @@
 
 		public static function asw_regular_price() {
 
-			echo '<div class="col-md-4"><div id="slider-range"></div></div>';
+			echo '<div class="col-md-5">';
+				echo '<label>' . __('Select the range price', 'sgmedia-asw') . '</label>: <span class="range-price"></span>';
+				echo '<div id="slider-range"></div>';
+			echo '</div>';
 
 		}
 
@@ -162,23 +168,36 @@
 			}
 
 			$meta_query = [
-				// 'relation' => 'AND',
-				// [
-				// 	'key' => '_regular_price',
-				// 	'value' => '',
-				// 	'compare' => '<'
-				// ],
-				// [
-				// 	'key' => '_regular_price',
-				// 	'value' => '',
-				// 	'compare' => '>'
-				// ]
-				[
-					'key' => '_sku',
-					'value' => isset(self::$ASWData->sku) ? sanitize_text_field(self::$ASWData->sku) : null,
-					'compare' => '='
-				]
+				'relation' => 'AND'
 			];
+
+			if (isset(self::$ASWData->sku) && self::$ASWData->sku !== '') {
+
+				$meta_query[] = [
+					'key' => '_sku',
+					'value' => sanitize_text_field(self::$ASWData->sku),
+					'compare' => '='
+				];
+
+			}
+
+			if (isset(self::$ASWData->regular_price_min) && self::$ASWData->regular_price_min !== '0') {
+				$meta_query[] = [
+					'key' => '_regular_price',
+					'value' => (int)sanitize_text_field(self::$ASWData->regular_price_min),
+					'compare' => '>',
+					'type' => 'NUMERIC'
+				];
+			}
+
+			if (isset(self::$ASWData->regular_price_max) && self::$ASWData->regular_price_max !== '0') {
+				$meta_query[] = [
+					'key' => '_regular_price',
+					'value' => (int)sanitize_text_field(self::$ASWData->regular_price_max),
+					'compare' => '<',
+					'type' => 'NUMERIC'
+				];
+			}
 
 			// Build a new query posts
 			$asw_query = array(
@@ -189,7 +208,7 @@
 				'orderby' => $orderby,
 				'order' => $order,
 				'meta_key' => $meta_key,
-				// 'meta_query' => $meta_query
+				'meta_query' => $meta_query
 			);
 
 			// Set the query posts
@@ -231,29 +250,18 @@
 
 				wp_enqueue_script('select2', ASW_PLUGIN_URL . 'public/js/select2.min.js', array(), false, true);
 				wp_enqueue_style('select2', ASW_PLUGIN_URL . 'public/css/select2.min.css');
+				wp_enqueue_style('public-style', ASW_PLUGIN_URL . 'public/css/style.css');
 
-				/**
-				* Create a new query and get the id from each product
-				* Set min and max price and send to JS file for create a range slider
-				**/
-				$products = new WP_Query(array(
-					'post_type' => 'product',
-	        'post_status' => 'publish',
-	        'fields' => 'ids',
-					'posts_per_page' => -1
-				));
-				foreach ($products->posts as $productID) {
-					if (wc_get_product($productID)->get_regular_price() !== '') {
-						self::$productsPrice[] = (float)wc_get_product($productID)->get_regular_price();
-					}
-				}
-				$minPrice = min(self::$productsPrice);
-				$maxPrice = max(self::$productsPrice);
+				$minPrice = min(ASW::get_all_products_price());
+				$maxPrice = max(ASW::get_all_products_price());
 				wp_register_script('asw-public', ASW_PLUGIN_URL . 'public/js/asw_public.js', array(), false, true);
 				wp_localize_script('asw-public', 'myAjax', array(
 					'ajaxurl' => admin_url('admin-ajax.php'),
 					'minPrice' => $minPrice,
-					'maxPrice' => $maxPrice
+					'maxPrice' => $maxPrice,
+					'currencySymbol' => get_woocommerce_currency_symbol(),
+					'limitMinPrice' => get_option('asw_min_regular_price'),
+					'limitMaxPrice' => get_option('asw_max_regular_price')
 				));
 				wp_enqueue_script('asw-public');
 

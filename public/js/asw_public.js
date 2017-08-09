@@ -25,6 +25,7 @@ $(document).ready(function() {
     if ($('*[name="product_cat"]').val() !== '' || $('*[name="orderby"]').val() !== '') {
 
       orderby = $('*[name="orderby"]').val();
+      console.log(orderby);
 
       $.ajax({
         type: 'post',
@@ -37,8 +38,8 @@ $(document).ready(function() {
           product_cat: $('*[name="product_cat"]').val(),
           orderby: orderby,
           sku: $('*[name="sku"]').val(),
-          reqular_price_min: regularPriceMin,
-          reqular_price_max: regularPriceMax
+          regular_price_min: regularPriceMin,
+          regular_price_max: regularPriceMax
         },
         success: function(data) {
 
@@ -108,18 +109,18 @@ function rangePrice() {
   $('#slider-range').slider({
 
     range: true,
-    // values: [ 75, 300 ], // Create in admin 2 fields
+    values: [ myAjax.limitMinPrice, myAjax.limitMaxPrice ], // Create in admin 2 fields
     min: Math.round(myAjax.minPrice),
     max: Math.round(myAjax.maxPrice),
     step: 1,
     slide: function(event, ui) {
       regularPriceMin = ui.values[0];
       regularPriceMax = ui.values[1];
+      $('.range-price').html(myAjax.currencySymbol + $('#slider-range').slider('values', 0) + ' - ' + myAjax.currencySymbol + $('#slider-range').slider('values', 1));
     }
-
   });
 
-  console.log($( '#slider-range' ).slider( 'option', 'min'), $( '#slider-range' ).slider( 'option', 'max'));
+  $('.range-price').html(myAjax.currencySymbol + $('#slider-range').slider('values', 0) + ' - ' + myAjax.currencySymbol + $('#slider-range').slider('values', 1));
 
 }
 
