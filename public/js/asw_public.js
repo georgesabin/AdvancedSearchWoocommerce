@@ -1,4 +1,5 @@
 $ = jQuery;
+
 // Get the all products before filter
 var initProducts = $('.asw-wrap').html();
 var regularPriceMin = 0;
@@ -44,8 +45,7 @@ $(document).ready(function() {
     showLoader('#asw-loader');
 
     // Check if the select is not empty
-    if ($('*[name="product_cat"]').val() !== '' || $('*[name="orderby"]').val() !== '' || $('*[name="stock_status"]').val() !== '') {
-
+    if ($(this).val() !== '') {
       orderby = $('*[name="orderby"]').val();
       console.log(orderby);
 
@@ -70,7 +70,7 @@ $(document).ready(function() {
           $('.asw-wrap').empty();
           // Modify html with the new data
           $('.asw-wrap').html(data);
-          console.log(1, hideLoader('#asw-loader'));
+          hideLoader('#asw-loader');
           // Remove href from paginationAJAX
           $('a.page-numbers').removeAttr('href');
           $('a.page-numbers').css( 'cursor', 'pointer' );
