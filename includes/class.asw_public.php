@@ -34,6 +34,8 @@
 
 			add_action('enable_category', array('ASWPublic','asw_enable_category'));
 
+			add_action('enable_stock_status', array('ASWPublic','asw_enable_stock_status'));
+
 			add_action('enable_slider_range_regular_price', array('ASWPublic','asw_regular_price'));
 
 			// Load JS & CSS files
@@ -53,7 +55,7 @@
 
 			if (isset(self::$SKU) && self::$SKU !== 'disable') {
 
-					echo '<div class="col-md-3">
+					echo '<div class="col-md-4">
 						<label for="sku">' . __('SKU Code', 'sgmedia-asw') . '</label>
 						<input class="form-control" type="search" name="sku" placeholder="' . __('Type the SKU code', 'sgmedia-asw') . '"/>
 					</div>';
@@ -80,11 +82,30 @@
 
 		}
 
+		public static function asw_enable_stock_status() {
+
+			// Get all stock statuses
+			$stocks = wc_get_product_stock_status_options();
+
+			if (isset(self::$category) && self::$category !== 'disable') {
+
+				echo '<div class="col-md-4">';
+					echo '<label for="product_cat">' . __('Stock status', 'sgmedia-asw') . '</label>';
+					echo '<select class="form-control" name="stock_status">';
+						echo '<option value="" disable>' .  __('Select a status', 'sgmedia-asw') . '</option>';
+	          foreach($stocks as $key => $stock) { echo '<option value="' . $key . '">' . $stock . '</option>'; }
+					echo '</select>';
+				echo '</div>';
+
+			}
+
+		}
+
 		public static function asw_regular_price() {
 
 			if (isset(self::$slideRegularPrice) && self::$slideRegularPrice !== 'disable') {
 
-				echo '<div class="col-md-5">';
+				echo '<div class="col-md-12">';
 					echo '<label>' . __('Select the range price', 'sgmedia-asw') . '</label>: <span class="range-price"></span>';
 					echo '<div id="slider-range"></div>';
 				echo '</div>';
@@ -100,6 +121,7 @@
 				echo '<input type="hidden" name="asw_nonce" value="' . wp_create_nonce('generate-nonce') . '" />';
 				do_action('enable_sku');
 				do_action('enable_category');
+				do_action('enable_status');
 				do_action('enable_slider_range_regular_price');
 			echo '</div>';
 			// echo '<button type="submit">' . __('Submit', 'sgmedia-asw'). '</button>';
@@ -184,6 +206,16 @@
 				$meta_query[] = [
 					'key' => '_sku',
 					'value' => sanitize_text_field(self::$ASWData->sku),
+					'compare' => '='
+				];
+
+			}
+
+			if (isset(self::$ASWData->stock_status) && self::$ASWData->stock_status !== '') {
+
+				$meta_query[] = [
+					'key' => '_stock_status',
+					'value' => sanitize_text_field(self::$ASWData->stock_status),
 					'compare' => '='
 				];
 

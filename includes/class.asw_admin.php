@@ -17,32 +17,52 @@
 		// Create the group of settings and add in group new settings
 		public static function asw_register_setting() {
 
-		   	register_setting('asw_settings', 'asw_sku');
-				register_setting('asw_settings', 'asw_category');
-				register_setting('asw_settings', 'asw_slide_regular_price');
-				register_setting('asw_settings', 'asw_min_regular_price');
-		    register_setting('asw_settings', 'asw_max_regular_price');
+			// General tab
+			add_settings_section('asw_section', '', array('ASWAdmin', 'asw_general_title'), 'asw_general');
 
-		    add_settings_section('asw_section', '', array('ASWAdmin', 'asw_section_function'), 'asw_settings');
+			// Settings tab
+	   	register_setting('asw_settings', 'asw_sku');
+			register_setting('asw_settings', 'asw_category');
+			register_setting('asw_settings', 'asw_status');
+			register_setting('asw_settings', 'asw_slide_regular_price');
+			register_setting('asw_settings', 'asw_min_regular_price');
+	    register_setting('asw_settings', 'asw_max_regular_price');
 
-		    add_settings_field('asw_sku_field', __('SKU','sgmedia-asw'), array('ASWAdmin','asw_field_sku'), 'asw_settings', 'asw_section');
+	    add_settings_section('asw_section', '', array('ASWAdmin', 'asw_settings_title'), 'asw_settings');
 
-				add_settings_field('asw_category_field', __( 'Category', 'sgmedia-asw' ), array('ASWAdmin','asw_field_category'), 'asw_settings', 'asw_section');
+	    add_settings_field('asw_sku_field', __('SKU','sgmedia-asw'), array('ASWAdmin','asw_field_sku'), 'asw_settings', 'asw_section');
 
-				add_settings_field('asw_slide_regular_price_field', __( 'Slide regular price', 'sgmedia-asw' ), array('ASWAdmin','asw_field_slide_regular_price'), 'asw_settings', 'asw_section');
+			add_settings_field('asw_category_field', __( 'Category', 'sgmedia-asw' ), array('ASWAdmin','asw_field_category'), 'asw_settings', 'asw_section');
 
-				add_settings_field('asw_min_regular_price', __( 'Min regular price', 'sgmedia-asw' ), array('ASWAdmin','asw_field_min_regular_price'), 'asw_settings', 'asw_section');
+			add_settings_field('asw_status_field', __( 'Status', 'sgmedia-asw' ), array('ASWAdmin','asw_field_status'), 'asw_settings', 'asw_section');
 
-		    add_settings_field('asw_max_regular_price', __( 'Max regular price', 'sgmedia-asw' ), array('ASWAdmin','asw_field_max_regular_price'), 'asw_settings', 'asw_section');
+			add_settings_field('asw_slide_regular_price_field', __( 'Slide regular price', 'sgmedia-asw' ), array('ASWAdmin','asw_field_slide_regular_price'), 'asw_settings', 'asw_section');
+
+			add_settings_field('asw_min_regular_price', __( 'Min regular price', 'sgmedia-asw' ), array('ASWAdmin','asw_field_min_regular_price'), 'asw_settings', 'asw_section');
+
+	    add_settings_field('asw_max_regular_price', __( 'Max regular price', 'sgmedia-asw' ), array('ASWAdmin','asw_field_max_regular_price'), 'asw_settings', 'asw_section');
 
 		}
 
-		// Functie callback setare
-		public static function asw_section_function($args) {
+		/**
+		* General section
+		* @method asw_general_title - public static
+		**/
 
-				echo '<h2 id="' . esc_attr($args['id']) . '" style="padding-top: 15px;">';
-					esc_html_e('Follow the white rabbit', 'sgmedia-asw');
-				echo '</h2>';
+		public static function asw_general_title($args) {
+
+				echo '<h2>' . __('General', 'sgmedia-asw') . '</h2>';
+
+		}
+
+		/**
+		* Settings section
+		* @method asw_settings_title - public static
+		**/
+
+		public static function asw_settings_title($args) {
+
+				echo '<h2>' . __('Settings', 'sgmedia-asw') . '</h2>';
 
 		}
 
@@ -65,6 +85,18 @@
 			?>
 
 			<input type="checkbox" name="asw_category" value="disable" <?php !empty($category) ? checked(esc_attr($category), 'disable', true) : ''; ?>> <?php echo __('Disable Category search', 'sgmedia-asw'); ?>
+
+			<?php
+
+		}
+
+		public static function asw_field_status($args) {
+
+			$status = get_option('asw_status');
+
+			?>
+
+			<input type="checkbox" name="asw_status" value="disable" <?php !empty($status) ? checked(esc_attr($status), 'disable', true) : ''; ?>> <?php echo __('Disable Status search', 'sgmedia-asw'); ?>
 
 			<?php
 
@@ -178,13 +210,11 @@
 	        <?php
 						switch ($active_tab) {
 							case 'general':
-
+								settings_fields('asw_general');
+								do_settings_sections('asw_general');
 								break;
 							case 'settings':
-								// output security fields for the registered setting "sgmedia-asw_options"
 								settings_fields('asw_settings');
-								// output setting sections and their fields
-								// (sections are registered for "sgmedia-asw", each field is registered to a specific section)
 								do_settings_sections('asw_settings');
 								break;
 							default:

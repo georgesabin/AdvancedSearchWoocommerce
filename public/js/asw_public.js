@@ -16,13 +16,14 @@ $(document).ready(function() {
 
   // Build select2
   $('*[name="product_cat"]').select2();
+  $('*[name="stock_status"]').select2();
 
   function ASW_AJAX(e) {
 
     e.preventDefault();
 
     // Check if the select is not empty
-    if ($('*[name="product_cat"]').val() !== '' || $('*[name="orderby"]').val() !== '') {
+    if ($('*[name="product_cat"]').val() !== '' || $('*[name="orderby"]').val() !== '' || $('*[name="stock_status"]').val() !== '') {
 
       orderby = $('*[name="orderby"]').val();
       console.log(orderby);
@@ -38,8 +39,10 @@ $(document).ready(function() {
           product_cat: $('*[name="product_cat"]').val(),
           orderby: orderby,
           sku: $('*[name="sku"]').val(),
+          stock_status: $('*[name="stock_status"]').val(),
           regular_price_min: regularPriceMin,
-          regular_price_max: regularPriceMax
+          regular_price_max: regularPriceMax,
+          nonce: $('*[name="asw_nonce"]').val()
         },
         success: function(data) {
 
@@ -60,7 +63,7 @@ $(document).ready(function() {
   }
 
   // Make a AJAX request if the select of category is changed or orderby is changed
-  $('body').on('change', '*[name="product_cat"], *[name="orderby"]', ASW_AJAX);
+  $('body').on('change', '*[name="product_cat"], *[name="orderby"], *[name="stock_status"]', ASW_AJAX);
 
   // Make a AJAX reqest if SKU input is completed
   $('body').on('input', '*[name="sku"]', ASW_AJAX);
@@ -90,6 +93,7 @@ function paginationAJAX() {
         paged: $(this).html(),
         orderby: orderby,
         sku: $('*[name="sku"]').val(),
+        stock_status: $('*[name="stock_status"]').val(),
         nonce: $('*[name="asw_nonce"]').val()
       },
       success: function(data) {
