@@ -8,6 +8,8 @@
 
 		private static $category;
 
+		private static $slideRegularPrice;
+
 		private static $ASWData;
 
 		private static $productsPrice;
@@ -19,6 +21,8 @@
 			self::$SKU = get_option('asw_sku');
 
 			self::$category = get_option('asw_category');
+
+			self::$slideRegularPrice = get_option('asw_slide_regular_price');
 
 			self::$productsPrice = [];
 
@@ -78,10 +82,14 @@
 
 		public static function asw_regular_price() {
 
-			echo '<div class="col-md-5">';
-				echo '<label>' . __('Select the range price', 'sgmedia-asw') . '</label>: <span class="range-price"></span>';
-				echo '<div id="slider-range"></div>';
-			echo '</div>';
+			if (isset(self::$slideRegularPrice) && self::$slideRegularPrice !== 'disable') {
+
+				echo '<div class="col-md-5">';
+					echo '<label>' . __('Select the range price', 'sgmedia-asw') . '</label>: <span class="range-price"></span>';
+					echo '<div id="slider-range"></div>';
+				echo '</div>';
+
+			}
 
 		}
 

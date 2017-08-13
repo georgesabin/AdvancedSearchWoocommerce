@@ -1,6 +1,4 @@
-.nav-tabs .nav-item {
-  font-size: 20px;
-}
-.nav-tabs .nav-item a:focus {
-  box-shadow: none;
+.wrap {
+  background-color: #fff !important;
+  padding: 20px !important;
 }

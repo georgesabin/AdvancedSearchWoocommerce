@@ -17,20 +17,23 @@
 		// Create the group of settings and add in group new settings
 		public static function asw_register_setting() {
 
-		   	register_setting('asw_general', 'asw_sku');
-				register_setting('asw_general', 'asw_category');
-				register_setting('asw_general', 'asw_min_regular_price');
-		    register_setting('asw_general', 'asw_max_regular_price');
+		   	register_setting('asw_settings', 'asw_sku');
+				register_setting('asw_settings', 'asw_category');
+				register_setting('asw_settings', 'asw_slide_regular_price');
+				register_setting('asw_settings', 'asw_min_regular_price');
+		    register_setting('asw_settings', 'asw_max_regular_price');
 
-		    add_settings_section('asw_section', '', array('ASWAdmin', 'asw_section_function'), 'asw_general');
+		    add_settings_section('asw_section', '', array('ASWAdmin', 'asw_section_function'), 'asw_settings');
 
-		    add_settings_field('asw_sku_field', __('SKU','sgmedia-asw'), array('ASWAdmin','asw_field_sku'), 'asw_general', 'asw_section');
+		    add_settings_field('asw_sku_field', __('SKU','sgmedia-asw'), array('ASWAdmin','asw_field_sku'), 'asw_settings', 'asw_section');
 
-				add_settings_field('asw_category_field', __( 'Category', 'sgmedia-asw' ), array('ASWAdmin','asw_field_category'), 'asw_general', 'asw_section');
+				add_settings_field('asw_category_field', __( 'Category', 'sgmedia-asw' ), array('ASWAdmin','asw_field_category'), 'asw_settings', 'asw_section');
 
-				add_settings_field('asw_min_regular_price', __( 'Min regular price', 'sgmedia-asw' ), array('ASWAdmin','asw_field_min_regular_price'), 'asw_general', 'asw_section');
+				add_settings_field('asw_slide_regular_price_field', __( 'Slide regular price', 'sgmedia-asw' ), array('ASWAdmin','asw_field_slide_regular_price'), 'asw_settings', 'asw_section');
 
-		    add_settings_field('asw_max_regular_price', __( 'Max regular price', 'sgmedia-asw' ), array('ASWAdmin','asw_field_max_regular_price'), 'asw_general', 'asw_section');
+				add_settings_field('asw_min_regular_price', __( 'Min regular price', 'sgmedia-asw' ), array('ASWAdmin','asw_field_min_regular_price'), 'asw_settings', 'asw_section');
+
+		    add_settings_field('asw_max_regular_price', __( 'Max regular price', 'sgmedia-asw' ), array('ASWAdmin','asw_field_max_regular_price'), 'asw_settings', 'asw_section');
 
 		}
 
@@ -67,52 +70,21 @@
 
 		}
 
-		/*public static function asw_field_pill_cb($args) {
+		public static function asw_field_slide_regular_price($args) {
 
-			// get the value of the setting we've registered with register_setting()
-
-			$options = get_option( 'asw_category_select' );
-
-			// output the field
+			$slide = get_option('asw_slide_regular_price');
 
 			?>
 
-			<select id="<?php echo esc_attr( $args['label_for'] ); ?>"
-			data-custom="<?php echo esc_attr( $args['wporg_custom_data'] ); ?>"
-			name="asw_options[<?php echo esc_attr( $args['label_for'] ); ?>]"
-			>
-
-				<option value="red" <?php echo isset( $options[ $args['label_for'] ] ) ? ( selected( $options[ $args['label_for'] ], 'red', false ) ) : ( '' ); ?>>
-
-					<?php esc_html_e( 'red pill', 'wporg' ); ?>
-
-				</option>
-
-				<option value="blue" <?php echo isset( $options[ $args['label_for'] ] ) ? ( selected( $options[ $args['label_for'] ], 'blue', false ) ) : ( '' ); ?>>
-
-					<?php esc_html_e( 'blue pill', 'wporg' ); ?>
-
-				</option>
-
-			</select>
-
-			<p class="description">
-
-				<?php esc_html_e( 'You take the blue pill and the story ends. You wake in your bed and you believe whatever you want to believe.', 'wporg' ); ?>
-
-			</p>
-
-			<p class="description">
-
-				<?php esc_html_e( 'You take the red pill and you stay in Wonderland and I show you how deep the rabbit-hole goes.', 'wporg' ); ?>
-
-			</p>
+			<input type="checkbox" name="asw_slide_regular_price" value="disable" <?php !empty($slide) ? checked(esc_attr($slide), 'disable', true) : ''; ?>> <?php echo __('Disable Slide regular price', 'sgmedia-asw'); ?>
 
 			<?php
 
-		}*/
+		}
 
 		public static function asw_field_min_regular_price($args) {
+
+			$slide = get_option('asw_slide_regular_price');
 
 			$min_regular_price = get_option('asw_min_regular_price');
 
@@ -120,7 +92,7 @@
 			$maxPrice = max(ASW::get_all_products_price());
 
 			?>
-			<input type="number" name="asw_min_regular_price" min="<?php echo $minPrice; ?>" max="<?php echo $maxPrice; ?>" value="<?php echo esc_attr($min_regular_price); ?>">
+			<input id="asw-min-regular-price" type="number" name="asw_min_regular_price" min="<?php echo $minPrice; ?>" max="<?php echo $maxPrice; ?>" value="<?php echo esc_attr($min_regular_price); ?>" <?php echo isset($slide) && $slide === 'disable' ? 'disabled' : ''; ?>>
 
 			<?php
 
@@ -128,13 +100,15 @@
 
 		public static function asw_field_max_regular_price($args) {
 
+			$slide = get_option('asw_slide_regular_price');
+
 			$max_regular_price = get_option('asw_max_regular_price');
 
 			$minPrice = min(ASW::get_all_products_price());
 			$maxPrice = max(ASW::get_all_products_price());
 
 			?>
-			<input type="number" name="asw_max_regular_price" min="<?php echo $minPrice; ?>" max="<?php echo $maxPrice; ?>" value="<?php echo esc_attr($max_regular_price); ?>">
+			<input id="asw-max-regular-price" type="number" name="asw_max_regular_price" min="<?php echo $minPrice; ?>" max="<?php echo $maxPrice; ?>" value="<?php echo esc_attr($max_regular_price); ?>" <?php echo isset($slide) && $slide === 'disable' ? 'disabled' : ''; ?> data-toggle="tooltip" data-placement="right" title="Tooltip on top">
 
 			<?php
 
@@ -159,11 +133,9 @@
 		public static function asw_admin() {
 
 			// check user capabilities
-		    if (!current_user_can('manage_options')) {
-		        return;
-		    }
-
-		    // add error/update messages
+	    if (!current_user_can('manage_options')) {
+	        return;
+	    }
 
 			// check if the user have submitted the settings
 			// wordpress will add the "settings-updated" $_GET parameter to the url
@@ -172,61 +144,58 @@
 				add_settings_error('asw_messages', 'asw_message', __( 'Settings Saved', 'sgmedia-asw' ), 'updated');
 			}
 
-			// show error/update messages
-			settings_errors( 'asw_messages' );
+	    ?>
+			<div class="wrap">
+	      <div id="icon-themes" class="icon32"></div>
+	      <h2><?php echo esc_html(get_admin_page_title()); ?></h2>
+	      <?php settings_errors('asw_messages'); ?>
+	      <?php
+					$active_tab = isset($_GET['tab']) ? $_GET['tab'] : 'general';
+					$tabs = [
+						(object)[
+							'name' => 'general',
+							'title' => 'General'
+						],
+						(object)[
+							'name' => 'settings',
+							'title' => 'Settings'
+						],
+						(object)[
+							'name' => 'custom_style',
+							'title' => 'Custom Style'
+						]
+					];
+				?>
 
-		    ?>
-		    <div class="bootstrap-wrapper">
-					<div class="container-fluid">
-						<div class="row">
+	      <h2 class="nav-tab-wrapper">
+					<?php
+						foreach ($tabs as $key => $tab) {
+							echo '<a href="?page=asw&tab=' . $tab->name . '" class="nav-tab ' . ($active_tab === $tab->name ? 'nav-tab-active' : '') . '">' . __($tab->title, 'sgmedia-asw') . '</a>';
+						}
+					?>
+	      </h2>
+	      <form method="post" action="options.php">
+	        <?php
+						switch ($active_tab) {
+							case 'general':
 
-								<div class="card" style="width:100%; max-width: none;">
-			  					<div class="card-block">
-							        <h4 class="card-title"><?php echo esc_html(get_admin_page_title()); ?></h4>
-											<ul class="nav nav-tabs" role="tablist">
-											  <li class="nav-item">
-											    <a class="nav-link active" data-toggle="tab" href="#general" role="tab"><?php echo __('General', 'sgmedia-asw'); ?></a>
-											  </li>
-											  <li class="nav-item">
-											    <a class="nav-link" data-toggle="tab" href="#profile" role="tab">Profile</a>
-											  </li>
-											  <li class="nav-item">
-											    <a class="nav-link" data-toggle="tab" href="#messages" role="tab">Messages</a>
-											  </li>
-											  <li class="nav-item">
-											    <a class="nav-link" data-toggle="tab" href="#settings" role="tab">Settings</a>
-											  </li>
-											</ul>
-											<form action="options.php" method="post">
-											    <?php
-
-													echo '<div class="tab-content">';
-														echo '<div class="tab-pane active" id="general" role="tabpanel">';
-											        // output security fields for the registered setting "sgmedia-asw_options"
-											        settings_fields('asw_general');
-											        // output setting sections and their fields
-											        // (sections are registered for "sgmedia-asw", each field is registered to a specific section)
-											        do_settings_sections('asw_general');
-														echo '</div>';
-														echo '<div class="tab-pane" id="profile" role="tabpanel">qweqe.</div>';
-													echo '</div>';
-
-											    // output save settings button
-											    submit_button('Save Settings');
-											    ?>
-											</form>
-											<div class="row">
-												<div class="col-md-12" style="text-align: right;">
-													<span class="badge badge-default">v 0.1</span>
-												</div>
-											</div>
-										</div>
-					    		</div>
-
-						</div>
-					</div>
-				</div>
-		    <?php
+								break;
+							case 'settings':
+								// output security fields for the registered setting "sgmedia-asw_options"
+								settings_fields('asw_settings');
+								// output setting sections and their fields
+								// (sections are registered for "sgmedia-asw", each field is registered to a specific section)
+								do_settings_sections('asw_settings');
+								break;
+							default:
+								# code...
+								break;
+						}
+	        ?>
+	        <?php submit_button(); ?>
+	      </form>
+    	</div>
+		  <?php
 
 		}
 
@@ -241,13 +210,16 @@
 		/**
 		* With bootstrap-include.js file will be include js and css files
 		**/
-		public static function asw_admin_scripts() {
+		public static function asw_admin_scripts($hook_suffix) {
 
-			wp_enqueue_script('tether', ASW_PLUGIN_URL . 'general/js/tether.min.js');
-			wp_enqueue_script('bootstrap-include-css', ASW_PLUGIN_URL . 'admin/js/bootstrap-include.js');
-			wp_enqueue_script('bootstrap', ASW_PLUGIN_URL . 'general/js/bootstrap.min.js');
-			// wp_enqueue_style('admin-style', ASW_PLUGIN_URL . 'admin/css/style.css');
-
+			// Load JS & CSS files just in the plugin page
+			if ($hook_suffix === 'woocommerce_page_asw') {
+				// wp_enqueue_script('tether', ASW_PLUGIN_URL . 'general/js/tether.min.js');
+				// wp_enqueue_script('bootstrap-include-css', ASW_PLUGIN_URL . 'admin/js/bootstrap-include.js');
+				// wp_enqueue_script('bootstrap', ASW_PLUGIN_URL . 'general/js/bootstrap.min.js');
+				wp_enqueue_script('asw-admin', ASW_PLUGIN_URL . 'admin/js/asw_admin.js');
+				wp_enqueue_style('admin-style', ASW_PLUGIN_URL . 'admin/css/style.css');
+			}
 
 		}
 
