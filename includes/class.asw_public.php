@@ -10,6 +10,8 @@
 
 		private static $slideRegularPrice;
 
+		private static $stockStatus;
+
 		private static $ASWData;
 
 		private static $productsPrice;
@@ -21,6 +23,8 @@
 			self::$SKU = get_option('asw_sku');
 
 			self::$category = get_option('asw_category');
+
+			self::$stockStatus = get_option('asw_stock_status');
 
 			self::$slideRegularPrice = get_option('asw_slide_regular_price');
 
@@ -47,7 +51,7 @@
 
 			// Added plugin wrap for build filter
 			add_action('woocommerce_before_shop_loop', array('ASWPublic', 'asw_before_class'), 10);
-			// add_action('woocommerce_after_main_content', array('ASWPublic', 'asw_after_class'), 10);
+			add_action('woocommerce_after_main_content', array('ASWPublic', 'asw_after_class'), 10);
 
 		}
 
@@ -87,7 +91,7 @@
 			// Get all stock statuses
 			$stocks = wc_get_product_stock_status_options();
 
-			if (isset(self::$category) && self::$category !== 'disable') {
+			if (isset(self::$stockStatus) && self::$stockStatus !== 'disable') {
 
 				echo '<div class="col-md-4">';
 					echo '<label for="product_cat">' . __('Stock status', 'sgmedia-asw') . '</label>';
@@ -116,12 +120,17 @@
 
 		public static function asw_output($args) {
 
-			echo '<div class="row">';
+			echo '<div class="row">
+				<div class="col-md-12">
+					<button id="asw-filter-button" type="button" class="btn btn-outline-primary pull-right">' . __('Filter', 'sgmedia-asw') . '</button>
+				</div>
+			</div>';
+			echo '<div id="asw-filter" class="row">';
 				echo '<input type="hidden" name="post_type" value="product" />';
 				echo '<input type="hidden" name="asw_nonce" value="' . wp_create_nonce('generate-nonce') . '" />';
 				do_action('enable_sku');
 				do_action('enable_category');
-				do_action('enable_status');
+				do_action('enable_stock_status');
 				do_action('enable_slider_range_regular_price');
 			echo '</div>';
 			// echo '<button type="submit">' . __('Submit', 'sgmedia-asw'). '</button>';
@@ -309,7 +318,7 @@
 
 			public static function asw_before_class() {
 
-				echo '<div class="asw_wrap">';
+				echo '<div class="asw-wrap"><div id="asw-loader"></div>';
 
 			}
 

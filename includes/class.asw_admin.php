@@ -23,7 +23,7 @@
 			// Settings tab
 	   	register_setting('asw_settings', 'asw_sku');
 			register_setting('asw_settings', 'asw_category');
-			register_setting('asw_settings', 'asw_status');
+			register_setting('asw_settings', 'asw_stock_status');
 			register_setting('asw_settings', 'asw_slide_regular_price');
 			register_setting('asw_settings', 'asw_min_regular_price');
 	    register_setting('asw_settings', 'asw_max_regular_price');
@@ -34,7 +34,7 @@
 
 			add_settings_field('asw_category_field', __( 'Category', 'sgmedia-asw' ), array('ASWAdmin','asw_field_category'), 'asw_settings', 'asw_section');
 
-			add_settings_field('asw_status_field', __( 'Status', 'sgmedia-asw' ), array('ASWAdmin','asw_field_status'), 'asw_settings', 'asw_section');
+			add_settings_field('asw_stock_status_field', __( 'Stock status', 'sgmedia-asw' ), array('ASWAdmin','asw_field_status'), 'asw_settings', 'asw_section');
 
 			add_settings_field('asw_slide_regular_price_field', __( 'Slide regular price', 'sgmedia-asw' ), array('ASWAdmin','asw_field_slide_regular_price'), 'asw_settings', 'asw_section');
 
@@ -90,9 +90,9 @@
 
 		}
 
-		public static function asw_field_status($args) {
+		public static function asw_field_stock_status($args) {
 
-			$status = get_option('asw_status');
+			$status = get_option('asw_stock_status');
 
 			?>
 

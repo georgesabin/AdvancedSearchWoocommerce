@@ -1,13 +1,28 @@
 $ = jQuery;
 // Get the all products before filter
-var initProducts = $('.asw_wrap').html();
+var initProducts = $('.asw-wrap').html();
 var regularPriceMin = 0;
 var regularPriceMax = 0;
 
 $('a.page-numbers').css( 'cursor', 'pointer' );
 
+function showLoader(selector) {
+  $(selector).show();
+}
+
+function hideLoader(selector) {
+  $(selector).hide();
+}
 
 $(document).ready(function() {
+
+  // Hide loader by default
+  hideLoader('#asw-loader');
+
+  $('#asw-filter').hide();
+  $('#asw-filter-button').click(function() {
+    $('#asw-filter').slideToggle(500);
+  });
 
   // Disabled submit ordering then when user access first time the shop page
   $('form.woocommerce-ordering').submit(function(event){
@@ -15,12 +30,18 @@ $(document).ready(function() {
     });
 
   // Build select2
-  $('*[name="product_cat"]').select2();
-  $('*[name="stock_status"]').select2();
+  $('*[name="product_cat"]').select2({
+    width: '100%'
+  });
+  $('*[name="stock_status"]').select2({
+    width: '100%'
+  });
 
   function ASW_AJAX(e) {
 
     e.preventDefault();
+
+    showLoader('#asw-loader');
 
     // Check if the select is not empty
     if ($('*[name="product_cat"]').val() !== '' || $('*[name="orderby"]').val() !== '' || $('*[name="stock_status"]').val() !== '') {
@@ -45,11 +66,11 @@ $(document).ready(function() {
           nonce: $('*[name="asw_nonce"]').val()
         },
         success: function(data) {
-
           // Empty the wrap
-          $('.asw_wrap').empty();
+          $('.asw-wrap').empty();
           // Modify html with the new data
-          $('.asw_wrap').html(data);
+          $('.asw-wrap').html(data);
+          console.log(1, hideLoader('#asw-loader'));
           // Remove href from paginationAJAX
           $('a.page-numbers').removeAttr('href');
           $('a.page-numbers').css( 'cursor', 'pointer' );
@@ -58,7 +79,7 @@ $(document).ready(function() {
         }
       });
 
-    } else { $('.asw_wrap').html(initProducts); }
+    } else { $('.asw-wrap').html(initProducts); }
 
   }
 
@@ -81,6 +102,7 @@ $(document).ready(function() {
 function paginationAJAX() {
 
   $('body').on('click', 'li a.page-numbers', function() {
+    showLoader('#asw-loader');
     orderby = $('*[name="orderby"]').val();
     $.ajax({
       type: 'post',
@@ -97,8 +119,9 @@ function paginationAJAX() {
         nonce: $('*[name="asw_nonce"]').val()
       },
       success: function(data) {
-        $('.asw_wrap').empty();
-        $('.asw_wrap').html(data);
+        $('.asw-wrap').empty();
+        $('.asw-wrap').html(data);
+        hideLoader('#asw-loader');
         $('a.page-numbers').css( 'cursor', 'pointer' );
         $('a.page-numbers').removeAttr('href');
         $('*[name="orderby"] option[value=' + orderby + ']').attr('selected', 'selected');
