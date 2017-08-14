@@ -53,6 +53,8 @@
 			add_action('woocommerce_before_shop_loop', array('ASWPublic', 'asw_before_class'), 10);
 			add_action('woocommerce_after_main_content', array('ASWPublic', 'asw_after_class'), 10);
 
+			add_shortcode('asw', array('ASWPublic', 'asw_shortcode'));
+
 		}
 
 		public static function asw_enable_sku() {
@@ -72,13 +74,13 @@
 
 			if (isset(self::$category) && self::$category !== 'disable') {
 
-	      $terms = get_terms('product_cat', 'order=ASC&hide_empty=0');
+				$terms = get_terms('product_cat', 'order=ASC&hide_empty=0');
 
 				echo '<div class="col-md-4">';
 					echo '<label for="product_cat">' . __('Category', 'sgmedia-asw') . '</label>';
 					echo '<select class="form-control" name="product_cat">';
 						echo '<option value="" disable>' .  __('Select a category', 'sgmedia-asw') . '</option>';
-	          foreach($terms as $term) { echo '<option value="' . $term->slug . '">' . $term->name . '</option>'; }
+						foreach($terms as $term) { echo '<option value="' . $term->slug . '">' . $term->name . '</option>'; }
 					echo '</select>';
 				echo '</div>';
 
@@ -88,16 +90,15 @@
 
 		public static function asw_enable_stock_status() {
 
-			// Get all stock statuses
-			$stocks = wc_get_product_stock_status_options();
-
 			if (isset(self::$stockStatus) && self::$stockStatus !== 'disable') {
 
+				// Get all stock statuses
+				$stocks = wc_get_product_stock_status_options();
 				echo '<div class="col-md-4">';
 					echo '<label for="product_cat">' . __('Stock status', 'sgmedia-asw') . '</label>';
 					echo '<select class="form-control" name="stock_status">';
 						echo '<option value="" disable>' .  __('Select a status', 'sgmedia-asw') . '</option>';
-	          foreach($stocks as $key => $stock) { echo '<option value="' . $key . '">' . $stock . '</option>'; }
+						foreach($stocks as $key => $stock) { echo '<option value="' . $key . '">' . $stock . '</option>'; }
 					echo '</select>';
 				echo '</div>';
 
@@ -181,25 +182,25 @@
 						$orderby = 'total_sales';
 						break;
 					case 'price':
-		        $meta_key = '_regular_price';
-		        $order = 'asc';
-		        $orderby = 'meta_value_num';
-		        break;
-		    case 'price-desc':
-		        $meta_key = '_regular_price';
-		        $order = 'desc';
-		        $orderby = 'meta_value_num';
-		        break;
-			    case 'date':
-		        $meta_key = '';
-		        $order = 'desc';
-		        $orderby = 'date';
-		        break;
-			    case 'rating':
-		        $meta_key = '';
-		        $order = 'desc';
-		        $orderby = 'rating';
-		        break;
+						$meta_key = '_regular_price';
+						$order = 'asc';
+						$orderby = 'meta_value_num';
+						break;
+				case 'price-desc':
+						$meta_key = '_regular_price';
+						$order = 'desc';
+						$orderby = 'meta_value_num';
+						break;
+					case 'date':
+						$meta_key = '';
+						$order = 'desc';
+						$orderby = 'date';
+						break;
+					case 'rating':
+						$meta_key = '';
+						$order = 'desc';
+						$orderby = 'rating';
+						break;
 					default:
 						break;
 				}
@@ -330,5 +331,68 @@
 
 			}
 
+			public static function asw_shortcode($atts, $content = null) {
+
+				$return = '';
+
+				$attributes = shortcode_atts([
+					'sku' 		 => 'enable',
+					'category' => 'enable',
+					'stock' 	 => 'enable',
+					'slider' 	 => 'enable'
+				], $atts);
+
+				if ($atts['sku'] === 'enable') {
+
+					$return .= '<div class="col-md-4">
+						<label for="sku">' . __('SKU Code', 'sgmedia-asw') . '</label>
+						<input class="form-control" type="search" name="sku" placeholder="' . __('Type the SKU code', 'sgmedia-asw') . '"/>
+					</div>';
+
+				}
+
+				if ($atts['category'] === 'enable') {
+
+					$terms = get_terms('product_cat', 'order=ASC&hide_empty=0');
+					$return .= '<div class="col-md-4">';
+					$return .= '<label for="product_cat">' . __('Category', 'sgmedia-asw') . '</label>';
+					$return .= '<select class="form-control" name="product_cat">';
+					$return .= '<option value="" disable>' .  __('Select a category', 'sgmedia-asw') . '</option>';
+					foreach($terms as $term) {
+						$return .= '<option value="' . $term->slug . '">' . $term->name . '</option>';
+					}
+					$return .= '</select>';
+					$return .= '</div>';
+
+				}
+
+				if ($atts['stock'] === 'enable') {
+
+					// Get all stock statuses
+					$stocks = wc_get_product_stock_status_options();
+					$return .= '<div class="col-md-4">';
+					$return .= '<label for="product_cat">' . __('Stock status', 'sgmedia-asw') . '</label>';
+					$return .= '<select class="form-control" name="stock_status">';
+						$return .= '<option value="" disable>' .  __('Select a status', 'sgmedia-asw') . '</option>';
+					foreach($stocks as $key => $stock) {
+						$return .= '<option value="' . $key . '">' . $stock . '</option>';
+					}
+					$return .= '</select>';
+					$return .= '</div>';
+
+				}
+
+				if ($atts['slider'] === 'enable') {
+
+					$return .= '<div class="col-md-12">';
+					$return .= '<label>' . __('Select the range price', 'sgmedia-asw') . '</label>: <span class="range-price"></span>';
+					$return .= '<div id="slider-range"></div>';
+					$return .= '</div>';
+
+				}
+
+				return $return;
+
+			}
 
 	}
