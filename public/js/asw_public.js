@@ -42,10 +42,8 @@ $(document).ready(function() {
 
     e.preventDefault();
 
-    showLoader('#asw-loader');
-
     // Check if the select is not empty
-    if ($(this).val() !== '') {
+    // if ($(this).val() !== '') {
       orderby = $('*[name="orderby"]').val();
       console.log(orderby);
 
@@ -65,12 +63,17 @@ $(document).ready(function() {
           regular_price_max: regularPriceMax,
           nonce: $('*[name="asw_nonce"]').val()
         },
+        beforeSend: function() {
+          showLoader('#asw-loader');
+          console.log(1);
+        },
         success: function(data) {
           // Empty the wrap
           $('.asw-wrap').empty();
           // Modify html with the new data
           $('.asw-wrap').html(data);
           hideLoader('#asw-loader');
+          console.log(2);
           // Remove href from paginationAJAX
           $('a.page-numbers').removeAttr('href');
           $('a.page-numbers').css( 'cursor', 'pointer' );
@@ -79,7 +82,7 @@ $(document).ready(function() {
         }
       });
 
-    } else { $('.asw-wrap').html(initProducts); }
+    // } else { $('.asw-wrap').html(initProducts); hideLoader('#asw-loader'); }
 
   }
 

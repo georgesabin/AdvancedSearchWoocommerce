@@ -300,6 +300,8 @@
 				wp_enqueue_script('select2', ASW_PLUGIN_URL . 'public/js/select2.min.js', array(), false, true);
 				wp_enqueue_style('select2', ASW_PLUGIN_URL . 'public/css/select2.min.css');
 				wp_enqueue_style('public-style', ASW_PLUGIN_URL . 'public/css/style.css');
+				// Load custom CSS
+				wp_enqueue_style('custom-style', ASW_PLUGIN_URL . 'public/css/custom.php', false);
 
 				$minPrice = min(ASW::get_all_products_price());
 				$maxPrice = max(ASW::get_all_products_price());

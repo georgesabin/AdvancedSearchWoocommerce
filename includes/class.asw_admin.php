@@ -4,6 +4,9 @@
 
 		private $all_settings;
 
+		/**
+		* Function for init functionality
+		**/
 		public static function init() {
 
 			add_action('admin_menu', array('ASWAdmin', 'asw_menu'));
@@ -14,7 +17,9 @@
 
 		}
 
-		// Create the group of settings and add in group new settings
+		/**
+		* Create the group of settings and add in group new settings
+		**/
 		public static function asw_register_setting() {
 
 			// General tab
@@ -34,13 +39,20 @@
 
 			add_settings_field('asw_category_field', __( 'Category', 'sgmedia-asw' ), array('ASWAdmin','asw_field_category'), 'asw_settings', 'asw_section');
 
-			add_settings_field('asw_stock_status_field', __( 'Stock status', 'sgmedia-asw' ), array('ASWAdmin','asw_field_status'), 'asw_settings', 'asw_section');
+			add_settings_field('asw_stock_status_field', __( 'Stock status', 'sgmedia-asw' ), array('ASWAdmin','asw_field_stock_status'), 'asw_settings', 'asw_section');
 
 			add_settings_field('asw_slide_regular_price_field', __( 'Slide regular price', 'sgmedia-asw' ), array('ASWAdmin','asw_field_slide_regular_price'), 'asw_settings', 'asw_section');
 
 			add_settings_field('asw_min_regular_price', __( 'Min regular price', 'sgmedia-asw' ), array('ASWAdmin','asw_field_min_regular_price'), 'asw_settings', 'asw_section');
 
 	    add_settings_field('asw_max_regular_price', __( 'Max regular price', 'sgmedia-asw' ), array('ASWAdmin','asw_field_max_regular_price'), 'asw_settings', 'asw_section');
+
+			// Custom style tab
+			add_settings_section('asw_section', '', array('ASWAdmin', 'asw_custom_style_title'), 'asw_custom_style');
+
+			register_setting('asw_custom_style', 'asw_css');
+
+			add_settings_field('asw_css_field', __('CSS', 'sgmedia-asw'), array('ASWAdmin', 'asw_field_css'), 'asw_custom_style', 'asw_section');
 
 		}
 
@@ -58,6 +70,12 @@
 		/**
 		* Settings section
 		* @method asw_settings_title - public static
+		* @method asw_field_sku - public static
+		* @method asw_field_category - public static
+		* @method asw_field_stock_status - public static
+		* @method asw_field_slide_regular_price - public static
+		* @method asw_field_min_regular_price - public static
+		* @method asw_field_max_regular_price - public static
 		**/
 
 		public static function asw_settings_title($args) {
@@ -70,11 +88,7 @@
 
 			$sku = get_option('asw_sku');
 
-			?>
-
-			<input type="checkbox" name="asw_sku" value="disable" <?php !empty($sku) ? checked(esc_attr($sku), 'disable', true) : ''; ?>> <?php echo __('Disable SKU search', 'sgmedia-asw'); ?>
-
-			<?php
+			echo '<input type="checkbox" name="asw_sku" value="disable" ' . (!empty($sku) ? checked(esc_attr($sku), 'disable', false) : '') . '>' . __('Disable SKU search', 'sgmedia-asw');
 
 		}
 
@@ -82,11 +96,7 @@
 
 			$category = get_option('asw_category');
 
-			?>
-
-			<input type="checkbox" name="asw_category" value="disable" <?php !empty($category) ? checked(esc_attr($category), 'disable', true) : ''; ?>> <?php echo __('Disable Category search', 'sgmedia-asw'); ?>
-
-			<?php
+			echo '<input type="checkbox" name="asw_category" value="disable" ' . (!empty($category) ? checked(esc_attr($category), 'disable', false) : '') . '>' . __('Disable Category search', 'sgmedia-asw');
 
 		}
 
@@ -94,11 +104,7 @@
 
 			$status = get_option('asw_stock_status');
 
-			?>
-
-			<input type="checkbox" name="asw_status" value="disable" <?php !empty($status) ? checked(esc_attr($status), 'disable', true) : ''; ?>> <?php echo __('Disable Status search', 'sgmedia-asw'); ?>
-
-			<?php
+			echo '<input type="checkbox" name="asw_stock_status" value="disable" ' . (!empty($status) ? checked(esc_attr($status), 'disable', false) : '') . '>' . __('Disable Status search', 'sgmedia-asw');
 
 		}
 
@@ -106,11 +112,7 @@
 
 			$slide = get_option('asw_slide_regular_price');
 
-			?>
-
-			<input type="checkbox" name="asw_slide_regular_price" value="disable" <?php !empty($slide) ? checked(esc_attr($slide), 'disable', true) : ''; ?>> <?php echo __('Disable Slide regular price', 'sgmedia-asw'); ?>
-
-			<?php
+			echo '<input type="checkbox" name="asw_slide_regular_price" value="disable" ' . (!empty($slide) ? checked(esc_attr($slide), 'disable', false) : '') . '>' . __('Disable Slide regular price', 'sgmedia-asw');
 
 		}
 
@@ -143,6 +145,35 @@
 			<input id="asw-max-regular-price" type="number" name="asw_max_regular_price" min="<?php echo $minPrice; ?>" max="<?php echo $maxPrice; ?>" value="<?php echo esc_attr($max_regular_price); ?>" <?php echo isset($slide) && $slide === 'disable' ? 'disabled' : ''; ?> data-toggle="tooltip" data-placement="right" title="Tooltip on top">
 
 			<?php
+
+		}
+
+		/**
+		* Custom style section
+		* @method asw_custom_style_title - public static
+		* @method asw_field_css - public static
+		**/
+		public static function asw_custom_style_title($args) {
+
+				echo '<h2>' . __('Custom style', 'sgmedia-asw') . '</h2>';
+
+		}
+
+		public static function asw_field_css($args) {
+
+			$custom_css_default = __('/*
+				Welcome to the Custom CSS editor!
+
+				Please add all your custom CSS here and avoid modifying the core theme files, since that\'ll make upgrading the theme problematic. Your custom CSS will be loaded after the theme\'s stylesheets, which means that your rules will take precedence. Just add your CSS here for what you want to change, you don\'t need to copy all the theme\'s style.css content.
+				*/'
+			);
+
+			$css = get_option('asw_css', $custom_css_default);
+
+			echo '<div id="custom_css_container">';
+				echo '<div name="asw_css" id="asw_css" style="border: 1px solid #DFDFDF; -moz-border-radius: 3px; -webkit-border-radius: 3px; border-radius: 3px; width: 100%; height: 400px; position: relative;"></div>';
+			echo '</div>';
+			echo '<textarea id="asw_css_textarea" name="asw_css" style="display: none;">' . $css . '</textarea>';
 
 		}
 
@@ -206,7 +237,7 @@
 						}
 					?>
 	      </h2>
-	      <form method="post" action="options.php">
+	      <form id="asw-form" method="post" action="options.php">
 	        <?php
 						switch ($active_tab) {
 							case 'general':
@@ -216,6 +247,10 @@
 							case 'settings':
 								settings_fields('asw_settings');
 								do_settings_sections('asw_settings');
+								break;
+							case 'custom_style':
+								settings_fields('asw_custom_style');
+								do_settings_sections('asw_custom_style');
 								break;
 							default:
 								# code...
@@ -247,6 +282,11 @@
 				// wp_enqueue_script('tether', ASW_PLUGIN_URL . 'general/js/tether.min.js');
 				// wp_enqueue_script('bootstrap-include-css', ASW_PLUGIN_URL . 'admin/js/bootstrap-include.js');
 				// wp_enqueue_script('bootstrap', ASW_PLUGIN_URL . 'general/js/bootstrap.min.js');
+
+				wp_enqueue_script( 'ace_code_highlighter_js', ASW_PLUGIN_URL . 'ace/ace.js', '', '1.0.0', true );
+        wp_enqueue_script( 'ace_mode_js', ASW_PLUGIN_URL . 'ace/mode-css.js', array( 'ace_code_highlighter_js' ), '1.0.0', true );
+        wp_enqueue_script( 'custom_css_js', ASW_PLUGIN_URL . 'admin/js/custom_css.js', array( 'jquery', 'ace_code_highlighter_js' ), '1.0.0', true );
+
 				wp_enqueue_script('asw-admin', ASW_PLUGIN_URL . 'admin/js/asw_admin.js');
 				wp_enqueue_style('admin-style', ASW_PLUGIN_URL . 'admin/css/style.css');
 			}
