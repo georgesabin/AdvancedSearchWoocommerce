@@ -71,6 +71,16 @@
 
 	    add_settings_field('asw_max_regular_price', __( 'Max regular price', 'sgmedia-asw' ), array('ASWAdmin','asw_field_max_regular_price'), 'asw_settings', 'asw_section');
 
+			// Shortcode tab
+			add_settings_section('asw_section', '', array('ASWAdmin', 'asw_shortcode_title'), 'asw_shortcode');
+
+			register_setting('asw_shortcode', 'asw_shortcode');
+			register_setting('asw_shortcode', 'asw_modal_title');
+
+			add_settings_field('asw_shortcode_field', __('Shortcode', 'sgmedia-asw'), array('ASWAdmin', 'asw_field_shortcode'), 'asw_shortcode', 'asw_section');
+
+			add_settings_field('asw_modal_title_field', __('Modal title', 'sgmedia-asw'), array('ASWAdmin', 'asw_field_modal_title'), 'asw_shortcode', 'asw_section');
+
 			// Custom style tab
 			add_settings_section('asw_section', '', array('ASWAdmin', 'asw_custom_style_title'), 'asw_custom_style');
 
@@ -233,6 +243,35 @@
 		}
 
 		/**
+		* Shortcode section
+		* @method asw_field_shortcode - public static
+		* @method asw_field_shortcode - public static
+		**/
+
+		public static function asw_shortcode_title($args) {
+
+				echo '<h2>' . __('Shortcode', 'sgmedia-asw') . '</h2>';
+
+		}
+
+		public static function asw_field_shortcode($args) {
+
+			echo '<input id="asw-shortcode" type="text" name="asw_shortcode" value="[asw sku=&quot;enable&quot; category=&quot;enable&quot; stock=&quot;enable&quot; slider=&quot;enable&quot;]" readonly/>';
+			echo '<br /><small><i>You can set this shortcode in any page/widget from WordPress site.</i></small>';
+			echo '<br /><small><i>This shortcode will display the filter and when you use this, will appear a modal with the results!</i></small>';
+			echo '<br /><small><i>Exemple in the below picture.</i></small>';
+
+		}
+
+		public static function asw_field_modal_title($args) {
+
+			$modalTitle = get_option('asw_modal_title', 'ASW');
+
+			echo '<input type="text" name="asw_modal_title" value="' . sanitize_text_field($modalTitle) . '" placeholder="Type the modal title"/>';
+
+		}
+
+		/**
 		* Custom style section
 		* @method asw_custom_style_title - public static
 		* @method asw_field_css - public static
@@ -308,6 +347,10 @@
 							'title' => 'Settings'
 						],
 						(object)[
+							'name' => 'shortcode',
+							'title' => 'Shortcode'
+						],
+						(object)[
 							'name' => 'custom_style',
 							'title' => 'Custom Style'
 						]
@@ -331,6 +374,10 @@
 							case 'settings':
 								settings_fields('asw_settings');
 								do_settings_sections('asw_settings');
+								break;
+							case 'shortcode':
+								settings_fields('asw_shortcode');
+								do_settings_sections('asw_shortcode');
 								break;
 							case 'custom_style':
 								settings_fields('asw_custom_style');

@@ -22,7 +22,7 @@ function hideLoader(wrap, selector) {
 $(document).ready(function() {
 
   $('a.page-numbers').css('cursor', 'pointer');
-  
+
   $('#asw-filter').hide();
   $('#asw-filter-button').click(function() {
     $('#asw-filter').slideToggle(myAjax.toggleSlideTime);
@@ -76,6 +76,7 @@ $(document).ready(function() {
         success: function(data) {
           // If shortcode is set, then open the modal with the request data
           if ($('*[name="is_shortcode"]').val() === 'true') {
+            $('#asw-title-modal').html(myAjax.shortcodeModalTitle);
             $('.modal-body').html(data);
             $('#woo-modal').modal('show');
             hideLoader('#asw-wrap-loader', '#asw-loader');

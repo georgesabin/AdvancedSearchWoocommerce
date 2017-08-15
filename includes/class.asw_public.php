@@ -326,7 +326,8 @@
 					'limitMinPrice' => get_option('asw_min_regular_price'),
 					'limitMaxPrice' => get_option('asw_max_regular_price'),
 					'disableLoader' => get_option('asw_loader'),
-					'toggleSlideTime' => get_option('asw_toggle_slide_time')
+					'toggleSlideTime' => get_option('asw_toggle_slide_time'),
+					'shortcodeModalTitle' => get_option('asw_modal_title') !== '' ? get_option('asw_modal_title') : __('ASW', 'sgmedia-asw')
 				));
 				wp_enqueue_script('asw-public');
 
@@ -416,12 +417,11 @@
 
 				global $post;
 				if (is_a($post, 'WP_Post') && has_shortcode($post->post_content, 'asw') && shortcode_exists('asw')) {
-
 					echo '<div class="modal fade" id="woo-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">';
 					  echo '<div class="modal-dialog" role="document">';
 					    echo '<div class="modal-content">';
 					      echo '<div class="modal-header">';
-					        echo '<h5 class="modal-title" id="exampleModalLabel">Modal title</h5>';
+					        echo '<h5 class="modal-title" id="asw-title-modal"></h5>';
 					        echo '<button type="button" class="close" data-dismiss="modal" aria-label="Close">';
 					          echo '<span aria-hidden="true">&times;</span>';
 					        echo '</button>';
