@@ -25,6 +25,30 @@
 			// General tab
 			add_settings_section('asw_section', '', array('ASWAdmin', 'asw_general_title'), 'asw_general');
 
+			register_setting('asw_general', 'asw_query_type');
+
+			register_setting('asw_general', 'asw_filter_button_title');
+			register_setting('asw_general', 'asw_filter_button_color');
+			register_setting('asw_general', 'asw_filter_button_background');
+
+			register_setting('asw_general', 'asw_loader_color_first');
+			register_setting('asw_general', 'asw_loader_color_second');
+			register_setting('asw_general', 'asw_loader');
+
+			register_setting('asw_general', 'asw_toggle_slide_time');
+
+			add_settings_field('asw_query_type_field', __('Query type','sgmedia-asw'), array('ASWAdmin','asw_field_query_type'), 'asw_general', 'asw_section');
+
+			add_settings_field('asw_filter_button_title_field', __('Filter button title','sgmedia-asw'), array('ASWAdmin','asw_field_filter_button_title'), 'asw_general', 'asw_section');
+
+			add_settings_field('asw_filter_button_color_field', __('Filter button color','sgmedia-asw'), array('ASWAdmin','asw_field_filter_button_color'), 'asw_general', 'asw_section');
+
+			add_settings_field('asw_filter_button_background_field', __('Filter button background','sgmedia-asw'), array('ASWAdmin','asw_field_filter_button_background'), 'asw_general', 'asw_section');
+
+			add_settings_field('asw_loader_field', __('AJAX loader','sgmedia-asw'), array('ASWAdmin','asw_field_loader'), 'asw_general', 'asw_section');
+
+			add_settings_field('asw_slide_time_field', __('Toggle slide time','sgmedia-asw'), array('ASWAdmin','asw_field_slide_time'), 'asw_general', 'asw_section');
+
 			// Settings tab
 	   	register_setting('asw_settings', 'asw_sku');
 			register_setting('asw_settings', 'asw_category');
@@ -59,11 +83,71 @@
 		/**
 		* General section
 		* @method asw_general_title - public static
+		* @method asw_field_query_type - public static
+		* @method asw_field_filter_button_title - public static
+		* @method asw_field_filter_button_color - public static
+		* @method asw_field_filter_button_background - public static
 		**/
 
 		public static function asw_general_title($args) {
 
 				echo '<h2>' . __('General', 'sgmedia-asw') . '</h2>';
+
+		}
+
+		public static function asw_field_query_type($args) {
+
+			$queryType = get_option('asw_query_type');
+
+			echo '<select name="asw_query_type">';
+				echo '<option value="">Select the query type</option>';
+				echo '<option value="AND"' . selected($queryType, 'AND') . '>AND</option>';
+				echo '<option value="OR"' . selected($queryType, 'OR') . '>OR</option>';
+			echo '</select>';
+
+		}
+
+		public static function asw_field_filter_button_title($args) {
+
+			$buttonTitle = get_option('asw_filter_button_title', 'Filter');
+
+			echo '<input type="text" name="asw_filter_button_title" value="' . sanitize_text_field($buttonTitle) . '" placeholder="Type the title"/>';
+
+		}
+
+		public static function asw_field_filter_button_color($args) {
+
+			$buttonColor = get_option('asw_filter_button_color');
+
+			echo '<input type="color" name="asw_filter_button_color" value="' . $buttonColor . '">';
+
+		}
+
+		public static function asw_field_filter_button_background($args) {
+
+			$buttonBackground = get_option('asw_filter_button_background');
+
+			echo '<input type="color" name="asw_filter_button_background" value="' . $buttonBackground . '">';
+
+		}
+
+		public static function asw_field_loader($args) {
+
+			$loaderFirstColor = get_option('asw_loader_color_first', '#3498db');
+			$loaderSecondColor = get_option('asw_loader_color_second', '#f3f3f3');
+			$loader = get_option('asw_loader');
+
+			echo '<input type="checkbox" name="asw_loader" value="disable" ' . (!empty($loader) ? checked(esc_attr($loader), 'disable', false) : '') . '>' . __('Disable AJAX loader', 'sgmedia-asw') . '<br /><br />';
+			echo '<input id="asw-loader-color-first" type="color" name="asw_loader_color_first" value="' . $loaderFirstColor . '"' . (isset($loader) && $loader === 'disable' ? 'disabled="disabled"' : '') . '>';
+			echo '<input id="asw-loader-color-second" type="color" name="asw_loader_color_second" value="' . $loaderSecondColor . '"' . (isset($loader) && $loader === 'disable' ? 'disabled="disabled"' : '') . '>';
+
+		}
+
+		public static function asw_field_slide_time($args) {
+
+			$toogleSlideTime = get_option('asw_toggle_slide_time', 500);
+
+			echo '<input type="number" name="asw_toggle_slide_time" min="0" value="' . esc_attr($toogleSlideTime) . '">';
 
 		}
 

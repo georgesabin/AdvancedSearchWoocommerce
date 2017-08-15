@@ -14,9 +14,17 @@
   margin-bottom: 20px;
 }
 /* Make loader */
+#asw-wrap-loader {
+  background: rgba(255, 255, 255, 0.6);
+  position: absolute;
+  width: 100%;
+  z-index: 4;
+  display: none;
+}
 #asw-loader {
-  border: 16px solid #f3f3f3; /* Light grey */
-  border-top: 16px solid #3498db; /* Blue */
+  display: none;
+  border: 16px solid #f3f3f3;
+  border-top: 16px solid #3498db;
   border-radius: 50%;
   width: 120px;
   height: 120px;
@@ -24,7 +32,7 @@
   background-color: rgba(255, 255, 255, .6);
   /* Position */
   position: absolute;
-  z-index: 1;
+  z-index: 5;
   overflow: auto;
   margin: auto;
   top: 0;
@@ -47,4 +55,12 @@
 }
 .select2-container--default .select2-selection--single .select2-selection__arrow {
   top: 4px !important;
+}
+
+/* WooStyle */
+.woocommerce-pagination .prev {
+  display: none !important;
+}
+.woocommerce-pagination .next {
+  display: none !important;
 }

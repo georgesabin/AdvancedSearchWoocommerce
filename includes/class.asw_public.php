@@ -12,6 +12,8 @@
 
 		private static $stockStatus;
 
+		private static $buttonFilterTitle;
+
 		private static $ASWData;
 
 		private static $productsPrice;
@@ -27,6 +29,8 @@
 			self::$stockStatus = get_option('asw_stock_status');
 
 			self::$slideRegularPrice = get_option('asw_slide_regular_price');
+
+			self::$buttonFilterTitle = get_option('asw_filter_button_title');
 
 			self::$productsPrice = [];
 
@@ -53,7 +57,11 @@
 			add_action('woocommerce_before_shop_loop', array('ASWPublic', 'asw_before_class'), 10);
 			add_action('woocommerce_after_main_content', array('ASWPublic', 'asw_after_class'), 10);
 
+			// Created shortcode
 			add_shortcode('asw', array('ASWPublic', 'asw_shortcode'));
+
+			// Added modal
+			add_action('wp_footer', array('ASWPublic', 'asw_modal_products'));
 
 		}
 
@@ -123,7 +131,7 @@
 
 			echo '<div class="row">
 				<div class="col-md-12">
-					<button id="asw-filter-button" type="button" class="btn btn-outline-primary pull-right">' . __('Filter', 'sgmedia-asw') . '</button>
+					<button id="asw-filter-button" type="button" class="btn btn-outline-primary pull-right">' . __(isset(self::$buttonFilterTitle) ? self::$buttonFilterTitle : 'Filter', 'sgmedia-asw') . '</button>
 				</div>
 			</div>';
 			echo '<div id="asw-filter" class="row">';
@@ -141,6 +149,9 @@
 		public static function asw_advancedSearchWoocommerceQuery() {
 
 			global $wp_query;
+
+			// Get the query type from general settings
+			$queryType = get_option('asw_query_type');
 
 			// Build the tax query
 			$tax_query = [];
@@ -208,7 +219,7 @@
 			}
 
 			$meta_query = [
-				'relation' => 'AND'
+				'relation' => isset($queryType) ? $queryType : 'AND'
 			];
 
 			if (isset(self::$ASWData->sku) && self::$ASWData->sku !== '') {
@@ -313,7 +324,9 @@
 					'maxPrice' => $maxPrice,
 					'currencySymbol' => get_woocommerce_currency_symbol(),
 					'limitMinPrice' => get_option('asw_min_regular_price'),
-					'limitMaxPrice' => get_option('asw_max_regular_price')
+					'limitMaxPrice' => get_option('asw_max_regular_price'),
+					'disableLoader' => get_option('asw_loader'),
+					'toggleSlideTime' => get_option('asw_toggle_slide_time')
 				));
 				wp_enqueue_script('asw-public');
 
@@ -321,7 +334,7 @@
 
 			public static function asw_before_class() {
 
-				echo '<div class="asw-wrap"><div id="asw-loader"></div>';
+				echo '<div class="asw-wrap"><div id="asw-wrap-loader"><div id="asw-loader"></div></div>';
 
 			}
 
@@ -333,7 +346,9 @@
 
 			public static function asw_shortcode($atts, $content = null) {
 
-				$return = '';
+				$return = '<div class="row">';
+
+				$return .= '<input type="hidden" name="is_shortcode" value="true"/>';
 
 				$attributes = shortcode_atts([
 					'sku' 		 => 'enable',
@@ -373,7 +388,7 @@
 					$return .= '<div class="col-md-4">';
 					$return .= '<label for="product_cat">' . __('Stock status', 'sgmedia-asw') . '</label>';
 					$return .= '<select class="form-control" name="stock_status">';
-						$return .= '<option value="" disable>' .  __('Select a status', 'sgmedia-asw') . '</option>';
+					$return .= '<option value="" disable>' .  __('Select a status', 'sgmedia-asw') . '</option>';
 					foreach($stocks as $key => $stock) {
 						$return .= '<option value="' . $key . '">' . $stock . '</option>';
 					}
@@ -391,7 +406,38 @@
 
 				}
 
+				$return .= '</div>';
+
 				return $return;
+
+			}
+
+			public static function asw_modal_products() {
+
+				global $post;
+				if (is_a($post, 'WP_Post') && has_shortcode($post->post_content, 'asw') && shortcode_exists('asw')) {
+
+					echo '<div class="modal fade" id="woo-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">';
+					  echo '<div class="modal-dialog" role="document">';
+					    echo '<div class="modal-content">';
+					      echo '<div class="modal-header">';
+					        echo '<h5 class="modal-title" id="exampleModalLabel">Modal title</h5>';
+					        echo '<button type="button" class="close" data-dismiss="modal" aria-label="Close">';
+					          echo '<span aria-hidden="true">&times;</span>';
+					        echo '</button>';
+					      echo '</div>';
+								echo '<div id="content" role="main">';
+						      echo '<div class="modal-body woocommerce">';
+						        echo '...';
+					      	echo '</div>';
+								echo '</div>';
+					      echo '<div class="modal-footer">';
+					        echo '<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>';
+					      echo '</div>';
+					    echo '</div>';
+					  echo '</div>';
+					echo '</div>';
+				}
 
 			}
 

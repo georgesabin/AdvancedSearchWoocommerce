@@ -5,24 +5,27 @@ var initProducts = $('.asw-wrap').html();
 var regularPriceMin = 0;
 var regularPriceMax = 0;
 
-$('a.page-numbers').css( 'cursor', 'pointer' );
-
-function showLoader(selector) {
-  $(selector).show();
+function showLoader(wrap, selector) {
+  if (myAjax.disableLoader !== 'disable') {
+    $(wrap).show();
+    $(selector).show();
+  }
 }
 
-function hideLoader(selector) {
-  $(selector).hide();
+function hideLoader(wrap, selector) {
+  if (myAjax.disableLoader !== 'disable') {
+    $(wrap).hide();
+    $(selector).hide();
+  }
 }
 
 $(document).ready(function() {
 
-  // Hide loader by default
-  hideLoader('#asw-loader');
-
+  $('a.page-numbers').css('cursor', 'pointer');
+  
   $('#asw-filter').hide();
   $('#asw-filter-button').click(function() {
-    $('#asw-filter').slideToggle(500);
+    $('#asw-filter').slideToggle(myAjax.toggleSlideTime);
   });
 
   // Disabled submit ordering then when user access first time the shop page
@@ -39,6 +42,9 @@ $(document).ready(function() {
   });
 
   function ASW_AJAX(e) {
+
+    // Set height for loader wrap
+    $('#asw-wrap-loader').css('height', $('.asw-wrap').height() + 'px');
 
     e.preventDefault();
 
@@ -64,20 +70,30 @@ $(document).ready(function() {
           nonce: $('*[name="asw_nonce"]').val()
         },
         beforeSend: function() {
-          showLoader('#asw-loader');
+          showLoader('#asw-wrap-loader', '#asw-loader');
           console.log(1);
         },
         success: function(data) {
-          // Empty the wrap
-          $('.asw-wrap').empty();
-          // Modify html with the new data
-          $('.asw-wrap').html(data);
-          hideLoader('#asw-loader');
-          console.log(2);
-          // Remove href from paginationAJAX
-          $('a.page-numbers').removeAttr('href');
-          $('a.page-numbers').css( 'cursor', 'pointer' );
-          $('*[name="orderby"] option[value=' + orderby + ']').attr('selected', 'selected');
+          // If shortcode is set, then open the modal with the request data
+          if ($('*[name="is_shortcode"]').val() === 'true') {
+            $('.modal-body').html(data);
+            $('#woo-modal').modal('show');
+            hideLoader('#asw-wrap-loader', '#asw-loader');
+            $('a.page-numbers').removeAttr('href');
+            $('a.page-numbers').css( 'cursor', 'pointer' );
+            $('*[name="orderby"] option[value=' + orderby + ']').attr('selected', 'selected');
+          } else {
+            // Empty the wrap
+            $('.asw-wrap').empty();
+            // Modify html with the new data
+            $('.asw-wrap').html(data);
+            hideLoader('#asw-wrap-loader', '#asw-loader');
+            console.log(2);
+            // Remove href from paginationAJAX
+            $('a.page-numbers').removeAttr('href');
+            $('a.page-numbers').css( 'cursor', 'pointer' );
+            $('*[name="orderby"] option[value=' + orderby + ']').attr('selected', 'selected');
+          }
 
         }
       });
@@ -105,7 +121,9 @@ $(document).ready(function() {
 function paginationAJAX() {
 
   $('body').on('click', 'li a.page-numbers', function() {
-    showLoader('#asw-loader');
+    // Set height for loader wrap
+    $('#asw-wrap-loader').css('height', $('.asw-wrap').height() + 'px');
+    showLoader('#asw-wrap-loader', '#asw-loader');
     orderby = $('*[name="orderby"]').val();
     $.ajax({
       type: 'post',
@@ -122,12 +140,22 @@ function paginationAJAX() {
         nonce: $('*[name="asw_nonce"]').val()
       },
       success: function(data) {
-        $('.asw-wrap').empty();
-        $('.asw-wrap').html(data);
-        hideLoader('#asw-loader');
-        $('a.page-numbers').css( 'cursor', 'pointer' );
-        $('a.page-numbers').removeAttr('href');
-        $('*[name="orderby"] option[value=' + orderby + ']').attr('selected', 'selected');
+        // If shortcode is set, then open the modal with the request data
+        if ($('*[name="is_shortcode"]').val() === 'true') {
+          $('.modal-body').html(data);
+          $('#woo-modal').modal('show');
+          hideLoader('#asw-wrap-loader', '#asw-loader');
+          $('a.page-numbers').css( 'cursor', 'pointer' );
+          $('a.page-numbers').removeAttr('href');
+          $('*[name="orderby"] option[value=' + orderby + ']').attr('selected', 'selected');
+        } else {
+          $('.asw-wrap').empty();
+          $('.asw-wrap').html(data);
+          hideLoader('#asw-wrap-loader', '#asw-loader');
+          $('a.page-numbers').css( 'cursor', 'pointer' );
+          $('a.page-numbers').removeAttr('href');
+          $('*[name="orderby"] option[value=' + orderby + ']').attr('selected', 'selected');
+        }
       }
     });
   });

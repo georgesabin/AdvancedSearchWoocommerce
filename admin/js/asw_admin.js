@@ -13,4 +13,15 @@ $(document).ready(function() {
     }
   });
 
+  // If loader checkbox is checked, then disable color, else activate
+  $('*[name="asw_loader"]').change(function() {
+    if ($('*[name="asw_loader"]').is(':checked')) {
+      $('#asw-loader-color-first').attr('disabled', true);
+      $('#asw-loader-color-second').attr('disabled', true);
+    } else {
+      $('#asw-loader-color-first').attr('disabled', false);
+      $('#asw-loader-color-second').attr('disabled', false);
+    }
+  });
+
 });
