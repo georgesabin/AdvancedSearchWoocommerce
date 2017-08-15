@@ -88,6 +88,9 @@
 
 			add_settings_field('asw_css_field', __('CSS', 'sgmedia-asw'), array('ASWAdmin', 'asw_field_css'), 'asw_custom_style', 'asw_section');
 
+			// About tab
+			add_settings_section('asw_section', '', array('ASWAdmin', 'asw_about_description'), 'asw_about');
+
 		}
 
 		/**
@@ -300,22 +303,18 @@
 
 		}
 
-		public function setAllSettings() {
-//modifica
-			$this->all_settings = [];
-			$this->all_settings['sku'] = get_option('asw_sku');
-			$this->all_settings['options'] = get_option('asw_options');
-			var_dump($this->all_settings);
+		/**
+		* About section
+		* @method asw_about_description - public static
+		**/
+
+		public static function asw_about_description($args) {
+
+			echo '<h1>About plugin and author</h1>';
+			echo '<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent gravida diam tincidunt lobortis venenatis. Proin accumsan, neque ut lacinia fermentum, odio arcu tempus nibh, in mollis magna neque ut sem. Vivamus iaculis ultrices magna vitae iaculis. Cras finibus molestie felis, pretium bibendum justo imperdiet quis. Phasellus id arcu placerat, consectetur felis sit amet, porttitor dui. Nunc tristique magna eget arcu auctor, sit amet placerat purus ornare. Donec molestie iaculis orci nec vehicula. Donec in odio vitae diam cursus bibendum. Quisque nibh enim, pulvinar consectetur varius vel, luctus in erat. </p>';
 
 		}
 
-		public function getAllSettings() {
-
-			return $this->all_settings;
-
-		}
-
-		// Adaug in pagina de plugin setarile si butonul de submit
 		public static function asw_admin() {
 
 			// check user capabilities
@@ -353,6 +352,10 @@
 						(object)[
 							'name' => 'custom_style',
 							'title' => 'Custom Style'
+						],
+						(object)[
+							'name' => 'about',
+							'title' => 'About'
 						]
 					];
 				?>
@@ -383,6 +386,10 @@
 								settings_fields('asw_custom_style');
 								do_settings_sections('asw_custom_style');
 								break;
+							case 'about':
+								settings_fields('asw_about');
+								do_settings_sections('asw_about');
+								break;
 							default:
 								# code...
 								break;
@@ -395,7 +402,7 @@
 
 		}
 
-		// Creez item menu in meniu din WP
+		// Create the item menu in woocommerce menu
 		public static function asw_menu() {
 			/**
 			* add_menu_page( string $page_title, string $menu_title, string $capability, string $menu_slug, callable $function = '', string $icon_url = '', int $position = null )
