@@ -12,6 +12,7 @@
 }
 #asw-filter-button {
   margin-bottom: 20px;
+  outline: 0;
 }
 /* Make loader */
 #asw-wrap-loader {
@@ -45,7 +46,9 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
-
+#slider-range span {
+  outline: 0;
+}
 /* Select2 style */
 .select2-container .select2-selection--single {
   height: 33px !important;

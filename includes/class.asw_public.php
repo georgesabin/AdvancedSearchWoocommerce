@@ -297,11 +297,52 @@
 				wc_get_template('loop/no-products-found.php');
 
 			}
-
+self::get_all_attributes();
 			wp_reset_query();
 
 			wp_die();
 
+		}
+
+		public static function get_all_attributes() {
+
+			$attributes = [];
+
+			$attributesArray = [];
+
+			// Build query
+			$productsQuery = new WP_Query(
+				[
+					'post_type' => 'product',
+					'post_status' => 'publish',
+					'posts_per_page' => -1
+				]
+			);
+			// Get attributes all products
+			foreach ($productsQuery->posts as $product) {
+				$attributes[$product->ID] = (new WC_Product($product->ID))->get_attributes();
+			}
+var_dump(get_locale());
+			// Build an array (key is product id/attr name) with an object what contains attribute name and options
+			foreach ($attributes as $key => $attribute) {
+				// Set the product id
+				$productId = $key;
+				foreach ($attribute as $key => $attr) {
+					// If attribute is taxonomy, else is attribute created directly in product, and both set the array
+					if (taxonomy_exists($attr['name']) === true) {
+						$attributesArray[$productId . '/' . $key] = (object)[
+							'name' => $attr['name'],
+							'options' => wc_get_product_terms($productId, $attr['name'])
+						];
+					} else {
+						$attributesArray[$productId . '/' . $key] = (object)[
+							'name' => $attr['name'],
+							'options' => $attr['options']
+						];
+					}
+				}
+			}
+			
 		}
 
 			public static function asw_load_css_js() {
