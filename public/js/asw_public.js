@@ -107,7 +107,7 @@ $(document).ready(function() {
   $('body').on('change', '*[name="product_cat"], *[name="orderby"], *[name="stock_status"]', ASW_AJAX);
 
   // Make a AJAX reqest if SKU input is completed
-  $('body').on('input', '*[name="sku"]', ASW_AJAX);
+  $('body').on('change', '*[name="sku"]', ASW_AJAX);
 
   // Make a AJAX reqest if range price is changed
   $('body').on('slidechange', '#slider-range', ASW_AJAX);
