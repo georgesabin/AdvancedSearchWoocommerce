@@ -39,6 +39,15 @@
 		define('ASW_PLUGIN_DIR', plugin_dir_path( __FILE__ ));
 		define('ASW_PLUGIN_URL', plugin_dir_url( __FILE__ ));
 
+		require_once(ASW_PLUGIN_DIR . 'plugin-update-checker-4.2/plugin-update-checker.php');
+		$myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
+			'https://github.com/georgesabin/AdvancedSearchWoocommerce/',
+			__FILE__,
+			'AdvancedSearchWoocommerce'
+		);
+		$myUpdateChecker->setBranch('development');
+		// var_dump($myUpdateChecker);
+
 		require_once(ASW_PLUGIN_DIR . 'includes/class.asw_activator.php');
 		require_once(ASW_PLUGIN_DIR . 'includes/class.asw_deactivator.php');
 		require_once(ASW_PLUGIN_DIR . 'includes/class.asw_i18n.php');
