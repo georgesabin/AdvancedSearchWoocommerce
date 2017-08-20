@@ -322,7 +322,7 @@ self::get_all_attributes();
 			foreach ($productsQuery->posts as $product) {
 				$attributes[$product->ID] = (new WC_Product($product->ID))->get_attributes();
 			}
-var_dump(get_locale());
+// var_dump(get_locale());
 			// Build an array (key is product id/attr name) with an object what contains attribute name and options
 			foreach ($attributes as $key => $attribute) {
 				// Set the product id
@@ -342,7 +342,7 @@ var_dump(get_locale());
 					}
 				}
 			}
-			
+
 		}
 
 			public static function asw_load_css_js() {

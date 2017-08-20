@@ -53,6 +53,12 @@
     public function init_admin() {
 
       if (is_admin()) {
+        require(ASW_PLUGIN_DIR . 'plugin-update-checker-4.2/plugin-update-checker.php');
+        $myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
+        	'https://github.com/georgesabin/AdvancedSearchWoocommerce/',
+        	__FILE__,
+        	'AdvancedSearchWoocommerce'
+        );
         require_once(ASW_PLUGIN_DIR . 'includes/tgm-plugin-activation/tgm_plugin_activation.php');
         ASWAdmin::init();
       }
