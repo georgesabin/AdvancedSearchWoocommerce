@@ -44,7 +44,7 @@
 		'AdvancedSearchWoocommerce'
 	);
 	$myUpdateChecker->setBranch('development');
-
+	var_dump($myUpdateChecker);
 	// Check if Woocommerce is activated on WP site
 	if (is_plugin_active('woocommerce/woocommerce.php')) {
 
