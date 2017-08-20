@@ -28,6 +28,12 @@ $(document).ready(function() {
     $('#asw-filter').slideToggle(myAjax.toggleSlideTime);
   });
 
+  // Create attributes functionallity
+  $('#asw-attributes').hide();
+  $('#asw-attributes-button').click(function() {
+    $('#asw-attributes').slideToggle(myAjax.toggleSlideTime);
+  });
+
   // Disabled submit ordering then when user access first time the shop page
   $('form.woocommerce-ordering').submit(function(event){
         event.preventDefault();

@@ -46,6 +46,8 @@
 
 			add_action('enable_slider_range_regular_price', array('ASWPublic','asw_regular_price'));
 
+			add_action('enable_attributes', array('ASWPublic','asw_attributes'));
+
 			// Load JS & CSS files
 			add_action('wp_enqueue_scripts', array('ASWPublic', 'asw_load_css_js'), 10);
 
@@ -127,6 +129,14 @@
 
 		}
 
+		public static function asw_attributes() {
+
+			echo '<div class="col-md-4">';
+				var_dump(self::get_all_attributes());
+			echo '</div>';
+
+		}
+
 		public static function asw_output($args) {
 
 			echo '<div class="row">
@@ -141,9 +151,13 @@
 				do_action('enable_category');
 				do_action('enable_stock_status');
 				do_action('enable_slider_range_regular_price');
+				echo '<div class="col-md-12 text-center">';
+					echo '<button id="asw-attributes-button" type="button" class="btn btn-sky text-uppercase btn-sm">' . __('Show attributes', 'sgmedia-asw') . '</button>';
+				echo '</div>';
+				echo '<div id="asw-attributes" class="row">';
+					do_action('enable_attributes');
+				echo '</div>';
 			echo '</div>';
-			// echo '<button type="submit">' . __('Submit', 'sgmedia-asw'). '</button>';
-
 		}
 
 		public static function asw_advancedSearchWoocommerceQuery() {
@@ -217,9 +231,14 @@
 				}
 
 			}
-
+var_dump(serialize( 'name' ) . serialize( 'test' ) . serialize( 'value' ) . serialize( 'asd' ));
 			$meta_query = [
-				'relation' => isset($queryType) ? $queryType : 'AND'
+				'relation' => isset($queryType) ? $queryType : 'AND',
+				[
+					'key' => '_product_attributes',
+					'value' => serialize( 'name' ) . serialize( 'test' ) . serialize( 'value' ) . serialize( 'asd' ),
+					'compare' => 'LIKE'
+				]
 			];
 
 			if (isset(self::$ASWData->sku) && self::$ASWData->sku !== '') {
@@ -297,7 +316,7 @@
 				wc_get_template('loop/no-products-found.php');
 
 			}
-self::get_all_attributes();
+
 			wp_reset_query();
 
 			wp_die();
@@ -330,18 +349,19 @@ self::get_all_attributes();
 				foreach ($attribute as $key => $attr) {
 					// If attribute is taxonomy, else is attribute created directly in product, and both set the array
 					if (taxonomy_exists($attr['name']) === true) {
-						$attributesArray[$productId . '/' . $key] = (object)[
+						$attributesArray[$key] = (object)[
 							'name' => $attr['name'],
 							'options' => wc_get_product_terms($productId, $attr['name'])
 						];
 					} else {
-						$attributesArray[$productId . '/' . $key] = (object)[
+						$attributesArray[$key] = (object)[
 							'name' => $attr['name'],
 							'options' => $attr['options']
 						];
 					}
 				}
 			}
+			return $attributesArray;
 
 		}
 

@@ -68,3 +68,66 @@
 .woocommerce-pagination .next {
   display: none !important;
 }
+
+/* Buttons Style */
+.btn{
+    margin: 4px;
+    box-shadow: 1px 1px 5px #888888;
+    outline: 0 !important;
+}
+.btn-xs{
+    font-weight: 300;
+}
+.btn-hot {
+color: #fff;
+background-color: #db5566;
+}
+.btn-hot:hover, .btn-sky.active:focus, .btn-hot:focus, .open>.dropdown-toggle.btn-hot {
+color: #fff;
+background-color: #df6a78;
+outline: none;}
+.btn-hot:active, .btn-hot.active {
+color: #fff;
+background-color: #c04b59;
+}
+.btn-sunny {
+color: #fff;
+background-color: #f4ad49;
+}
+.btn-sunny:hover, .btn-sky.active:focus, .btn-sunny:focus, .open>.dropdown-toggle.btn-sunny {
+color: #fff;
+background-color: #f5b75f;
+outline: none;
+}
+.btn-sunny:active, .btn-sunny.active {
+color: #fff;
+background-color: #d69840;
+}
+.btn-fresh {
+color: #fff;
+background-color: #51bf87;
+}
+.btn-fresh:hover, .btn-sky.active:focus, .btn-fresh:focus, .open>.dropdown-toggle.btn-fresh {
+color: #fff;
+background-color: #66c796;
+outline: none;
+}
+.btn-fresh:active, .btn-fresh.active {
+color: #fff;
+background-color: #47a877;
+outline: none;
+outline-offset: none;
+}
+.btn-sky {
+color: #fff;
+background-color: #0bacd3;
+}
+.btn-sky:hover,.btn-sky.active:focus, .btn-sky:focus, .open>.dropdown-toggle.btn-sky {
+color: #fff;
+background-color: #29b6d8;
+outline: none;
+}
+.btn-sky:active, .btn-sky.active {
+color: #fff;
+background-color: #0a97b9;
+}
