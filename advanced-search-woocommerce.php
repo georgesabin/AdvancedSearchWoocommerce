@@ -3,7 +3,7 @@
 	Plugin Name: Advanced Search Woocommerce
 	Plugin URI: https://www.sgmedia.ro/
 	Description: Basic WordPress Plugin Header Comment
-	Version:     0.2
+	Version:     0.1
 	Author:      SG Media Freelance WP Developer
 	Author URI:  https://www.sgmedia.ro/
 	License:     GPL2
@@ -44,7 +44,7 @@
 		'AdvancedSearchWoocommerce'
 	);
 	$myUpdateChecker->setBranch('development');
-	var_dump($myUpdateChecker);
+
 	// Check if Woocommerce is activated on WP site
 	if (is_plugin_active('woocommerce/woocommerce.php')) {
 
