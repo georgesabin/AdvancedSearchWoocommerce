@@ -53,7 +53,6 @@
     public function init_admin() {
 
       if (is_admin()) {
-        require_once(ASW_PLUGIN_DIR . 'includes/tgm-plugin-activation/tgm_plugin_activation.php');
         ASWAdmin::init();
       }
 

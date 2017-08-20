@@ -103,6 +103,13 @@ function sgmedia_asw_register_required_plugins() {
 		'dismiss_msg'  => '',                      // If 'dismissable' is false, this message will be output at top of nag.
 		'is_automatic' => false,                   // Automatically activate plugins after installation or not.
 		'message'      => '',                      // Message to output right before the plugins table.
+		'strings' 		   => array (
+			'notice_can_install_required'     => _n_noop(
+				'The ASW plugin requires the following plugin: %1$s.',
+				'The ASW plugin requires the following plugins: %1$s.',
+				'sgmedia-asw'
+			)
+		)
 
 		/*
 		'strings'      => array(
