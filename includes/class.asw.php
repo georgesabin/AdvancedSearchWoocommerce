@@ -59,6 +59,8 @@
         	__FILE__,
         	'AdvancedSearchWoocommerce'
         );
+        $myUpdateChecker->setBranch('development');
+        // var_dump($myUpdateChecker);
         require_once(ASW_PLUGIN_DIR . 'includes/tgm-plugin-activation/tgm_plugin_activation.php');
         ASWAdmin::init();
       }
