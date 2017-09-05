@@ -131,8 +131,8 @@
 
 		public static function asw_attributes() {
 
-			echo '<div class="col-md-4">';
-				var_dump(self::get_all_attributes());
+			echo '<div class="col-md-12">';
+				var_dump('here', self::asw_generate_attr_query_like());
 			echo '</div>';
 
 		}
@@ -231,12 +231,13 @@
 				}
 
 			}
-var_dump(serialize( 'name' ) . serialize( 'test' ) . serialize( 'value' ) . serialize( 'asd' ));
+var_dump(serialize( 'name' ) . serialize( 'test' ) . serialize( 'value' ) . serialize( 'asd|proba' ));
 			$meta_query = [
 				'relation' => isset($queryType) ? $queryType : 'AND',
+				// here set array with attributes like
 				[
 					'key' => '_product_attributes',
-					'value' => serialize( 'name' ) . serialize( 'test' ) . serialize( 'value' ) . serialize( 'asd' ),
+					'value' => serialize( 'name' ) . serialize( 'Color' ) . serialize( 'value' ) . serialize( 'Red' ),
 					'compare' => 'LIKE'
 				]
 			];
@@ -294,6 +295,9 @@ var_dump(serialize( 'name' ) . serialize( 'test' ) . serialize( 'value' ) . seri
 			// Set the query posts
 			query_posts($asw_query);
 
+			global $wpdb;
+			var_dump($wpdb->last_query);
+
 			if (have_posts()) {
 
 				// I don't want the sorting anymore
@@ -342,6 +346,7 @@ var_dump(serialize( 'name' ) . serialize( 'test' ) . serialize( 'value' ) . seri
 				$attributes[$product->ID] = (new WC_Product($product->ID))->get_attributes();
 			}
 // var_dump(get_locale());
+// var_dump($attributes);
 			// Build an array (key is product id/attr name) with an object what contains attribute name and options
 			foreach ($attributes as $key => $attribute) {
 				// Set the product id
@@ -365,141 +370,179 @@ var_dump(serialize( 'name' ) . serialize( 'test' ) . serialize( 'value' ) . seri
 
 		}
 
-			public static function asw_load_css_js() {
+		public static function asw_generate_attr_query_like() {
 
-				wp_enqueue_script('jquery-ui', 'https://code.jquery.com/ui/1.12.1/jquery-ui.js', array(), false, true);
-				wp_enqueue_style('jquery-ui', '//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css');
+			$attributes = self::get_all_attributes();
 
-				wp_enqueue_script('select2', ASW_PLUGIN_URL . 'public/js/select2.min.js', array(), false, true);
-				wp_enqueue_style('select2', ASW_PLUGIN_URL . 'public/css/select2.min.css');
-				wp_enqueue_style('public-style', ASW_PLUGIN_URL . 'public/css/style.css');
-				// Load custom CSS
-				wp_enqueue_style('custom-style', ASW_PLUGIN_URL . 'public/css/custom.php', false);
+			if (isset($attributes)) {
 
-				$minPrice = min(ASW::get_all_products_price());
-				$maxPrice = max(ASW::get_all_products_price());
-				wp_register_script('asw-public', ASW_PLUGIN_URL . 'public/js/asw_public.js', array(), false, true);
-				wp_localize_script('asw-public', 'myAjax', array(
-					'ajaxurl' => admin_url('admin-ajax.php'),
-					'minPrice' => $minPrice,
-					'maxPrice' => $maxPrice,
-					'currencySymbol' => get_woocommerce_currency_symbol(),
-					'limitMinPrice' => get_option('asw_min_regular_price'),
-					'limitMaxPrice' => get_option('asw_max_regular_price'),
-					'disableLoader' => get_option('asw_loader'),
-					'toggleSlideTime' => get_option('asw_toggle_slide_time'),
-					'shortcodeModalTitle' => get_option('asw_modal_title') !== '' ? get_option('asw_modal_title') : __('ASW', 'sgmedia-asw')
-				));
-				wp_enqueue_script('asw-public');
+				$queryLike = [
+					'relation' => 'AND'
+				];
 
-			}
+				$value = '';
 
-			public static function asw_before_class() {
-
-				echo '<div class="asw-wrap"><div id="asw-wrap-loader"><div id="asw-loader"></div></div>';
-
-			}
-
-			public static function asw_after_class() {
-
-				echo '</div>';
-
-			}
-
-			public static function asw_shortcode($atts, $content = null) {
-
-				$return = '<div class="row">';
-
-				$return .= '<input type="hidden" name="is_shortcode" value="true"/>';
-
-				$attributes = shortcode_atts([
-					'sku' 		 => 'enable',
-					'category' => 'enable',
-					'stock' 	 => 'enable',
-					'slider' 	 => 'enable'
-				], $atts);
-
-				if ($atts['sku'] === 'enable') {
-
-					$return .= '<div class="col-md-4">
-						<label for="sku">' . __('SKU Code', 'sgmedia-asw') . '</label>
-						<input class="form-control" type="search" name="sku" placeholder="' . __('Type the SKU code', 'sgmedia-asw') . '"/>
-					</div>';
-
-				}
-
-				if ($atts['category'] === 'enable') {
-
-					$terms = get_terms('product_cat', 'order=ASC&hide_empty=0');
-					$return .= '<div class="col-md-4">';
-					$return .= '<label for="product_cat">' . __('Category', 'sgmedia-asw') . '</label>';
-					$return .= '<select class="form-control" name="product_cat">';
-					$return .= '<option value="" disable>' .  __('Select a category', 'sgmedia-asw') . '</option>';
-					foreach($terms as $term) {
-						$return .= '<option value="' . $term->slug . '">' . $term->name . '</option>';
+				foreach ($attributes as $attr) {
+					if (strpos($attr->name, 'pa_') === false) {
+						foreach ($attr->options as $key => $option) {
+							if ($key !== count($attr->options)-1) {
+								$value .= $option . ' | ';
+							} else {
+								$value .= $option;
+							}
+						}
+						$queryLike[] = [
+							'key' => '_product_attributes',
+							'value' => serialize( 'name' ) . serialize( $attr->name ) . serialize( 'value' ) . serialize( $value ),
+							'compare' => 'LIKE'
+						];
+						$value = '';
 					}
-					$return .= '</select>';
-					$return .= '</div>';
-
 				}
 
-				if ($atts['stock'] === 'enable') {
+				return $queryLike;
 
-					// Get all stock statuses
-					$stocks = wc_get_product_stock_status_options();
-					$return .= '<div class="col-md-4">';
-					$return .= '<label for="product_cat">' . __('Stock status', 'sgmedia-asw') . '</label>';
-					$return .= '<select class="form-control" name="stock_status">';
-					$return .= '<option value="" disable>' .  __('Select a status', 'sgmedia-asw') . '</option>';
-					foreach($stocks as $key => $stock) {
-						$return .= '<option value="' . $key . '">' . $stock . '</option>';
-					}
-					$return .= '</select>';
-					$return .= '</div>';
+			}
 
+			return null;
+
+		}
+
+		public static function asw_load_css_js() {
+
+			wp_enqueue_script('jquery-ui', 'https://code.jquery.com/ui/1.12.1/jquery-ui.js', array(), false, true);
+			wp_enqueue_style('jquery-ui', '//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css');
+
+			wp_enqueue_script('select2', ASW_PLUGIN_URL . 'public/js/select2.min.js', array(), false, true);
+			wp_enqueue_style('select2', ASW_PLUGIN_URL . 'public/css/select2.min.css');
+			wp_enqueue_style('public-style', ASW_PLUGIN_URL . 'public/css/style.css');
+			// Load custom CSS
+			wp_enqueue_style('custom-style', ASW_PLUGIN_URL . 'public/css/custom.php', false);
+
+			$minPrice = min(ASW::get_all_products_price());
+			$maxPrice = max(ASW::get_all_products_price());
+			wp_register_script('asw-public', ASW_PLUGIN_URL . 'public/js/asw_public.js', array(), false, true);
+			wp_localize_script('asw-public', 'myAjax', array(
+				'ajaxurl' => admin_url('admin-ajax.php'),
+				'minPrice' => $minPrice,
+				'maxPrice' => $maxPrice,
+				'currencySymbol' => get_woocommerce_currency_symbol(),
+				'limitMinPrice' => get_option('asw_min_regular_price'),
+				'limitMaxPrice' => get_option('asw_max_regular_price'),
+				'disableLoader' => get_option('asw_loader'),
+				'toggleSlideTime' => get_option('asw_toggle_slide_time'),
+				'shortcodeModalTitle' => get_option('asw_modal_title') !== '' ? get_option('asw_modal_title') : __('ASW', 'sgmedia-asw')
+			));
+			wp_enqueue_script('asw-public');
+
+		}
+
+		public static function asw_before_class() {
+
+			echo '<div class="asw-wrap"><div id="asw-wrap-loader"><div id="asw-loader"></div></div>';
+
+		}
+
+		public static function asw_after_class() {
+
+			echo '</div>';
+
+		}
+
+		public static function asw_shortcode($atts, $content = null) {
+
+			$return = '<div class="row">';
+
+			$return .= '<input type="hidden" name="is_shortcode" value="true"/>';
+
+			$attributes = shortcode_atts([
+				'sku' 		 => 'enable',
+				'category' => 'enable',
+				'stock' 	 => 'enable',
+				'slider' 	 => 'enable'
+			], $atts);
+
+			if ($atts['sku'] === 'enable') {
+
+				$return .= '<div class="col-md-4">
+					<label for="sku">' . __('SKU Code', 'sgmedia-asw') . '</label>
+					<input class="form-control" type="search" name="sku" placeholder="' . __('Type the SKU code', 'sgmedia-asw') . '"/>
+				</div>';
+
+			}
+
+			if ($atts['category'] === 'enable') {
+
+				$terms = get_terms('product_cat', 'order=ASC&hide_empty=0');
+				$return .= '<div class="col-md-4">';
+				$return .= '<label for="product_cat">' . __('Category', 'sgmedia-asw') . '</label>';
+				$return .= '<select class="form-control" name="product_cat">';
+				$return .= '<option value="" disable>' .  __('Select a category', 'sgmedia-asw') . '</option>';
+				foreach($terms as $term) {
+					$return .= '<option value="' . $term->slug . '">' . $term->name . '</option>';
 				}
-
-				if ($atts['slider'] === 'enable') {
-
-					$return .= '<div class="col-md-12">';
-					$return .= '<label>' . __('Select the range price', 'sgmedia-asw') . '</label>: <span class="range-price"></span>';
-					$return .= '<div id="slider-range"></div>';
-					$return .= '</div>';
-
-				}
-
+				$return .= '</select>';
 				$return .= '</div>';
 
-				return $return;
-
 			}
 
-			public static function asw_modal_products() {
+			if ($atts['stock'] === 'enable') {
 
-				global $post;
-				if (is_a($post, 'WP_Post') && has_shortcode($post->post_content, 'asw') && shortcode_exists('asw')) {
-					echo '<div class="modal fade" id="woo-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">';
-					  echo '<div class="modal-dialog" role="document">';
-					    echo '<div class="modal-content">';
-					      echo '<div class="modal-header">';
-					        echo '<h5 class="modal-title" id="asw-title-modal"></h5>';
-					        echo '<button type="button" class="close" data-dismiss="modal" aria-label="Close">';
-					          echo '<span aria-hidden="true">&times;</span>';
-					        echo '</button>';
-					      echo '</div>';
-								echo '<div id="content" role="main">';
-						      echo '<div class="modal-body woocommerce">';
-						        echo '...';
-					      	echo '</div>';
-								echo '</div>';
-					      echo '<div class="modal-footer">';
-					        echo '<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>';
-					      echo '</div>';
-					    echo '</div>';
-					  echo '</div>';
-					echo '</div>';
+				// Get all stock statuses
+				$stocks = wc_get_product_stock_status_options();
+				$return .= '<div class="col-md-4">';
+				$return .= '<label for="product_cat">' . __('Stock status', 'sgmedia-asw') . '</label>';
+				$return .= '<select class="form-control" name="stock_status">';
+				$return .= '<option value="" disable>' .  __('Select a status', 'sgmedia-asw') . '</option>';
+				foreach($stocks as $key => $stock) {
+					$return .= '<option value="' . $key . '">' . $stock . '</option>';
 				}
+				$return .= '</select>';
+				$return .= '</div>';
 
 			}
+
+			if ($atts['slider'] === 'enable') {
+
+				$return .= '<div class="col-md-12">';
+				$return .= '<label>' . __('Select the range price', 'sgmedia-asw') . '</label>: <span class="range-price"></span>';
+				$return .= '<div id="slider-range"></div>';
+				$return .= '</div>';
+
+			}
+
+			$return .= '</div>';
+
+			return $return;
+
+		}
+
+		public static function asw_modal_products() {
+
+			global $post;
+			if (is_a($post, 'WP_Post') && has_shortcode($post->post_content, 'asw') && shortcode_exists('asw')) {
+				echo '<div class="modal fade" id="woo-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">';
+				  echo '<div class="modal-dialog" role="document">';
+				    echo '<div class="modal-content">';
+				      echo '<div class="modal-header">';
+				        echo '<h5 class="modal-title" id="asw-title-modal"></h5>';
+				        echo '<button type="button" class="close" data-dismiss="modal" aria-label="Close">';
+				          echo '<span aria-hidden="true">&times;</span>';
+				        echo '</button>';
+				      echo '</div>';
+							echo '<div id="content" role="main">';
+					      echo '<div class="modal-body woocommerce">';
+					        echo '...';
+				      	echo '</div>';
+							echo '</div>';
+				      echo '<div class="modal-footer">';
+				        echo '<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>';
+				      echo '</div>';
+				    echo '</div>';
+				  echo '</div>';
+				echo '</div>';
+			}
+
+		}
 
 	}
